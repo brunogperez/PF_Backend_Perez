@@ -1,0 +1,322 @@
+
+paths: 
+  /api/session/products/:
+    get:
+      summary: Todos los Products
+      tags:
+        - Product
+      requestBody:
+        required: true
+        content: 
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: Título del producto
+                description:
+                  type: String
+                  description: Descripción del producto
+                code:
+                  type: String
+                  description: Codigo del producto
+                price:
+                  type: Number
+                  description: Precio del producto
+                stock:
+                  type: Number
+                  description:  Cantidad de stock
+                category:
+                  type: String
+                  description: Categoria del producto
+      responses:
+        '200':
+          description: Los productos se muestran correctamente
+          content:
+            application/json:
+              schema:
+                type: Object
+                properties:
+                  title:
+                    type: String
+                    description: Titulo del producto
+                  description:
+                    type: String
+                    description: Descripcion del producto
+                  code:
+                    type: String
+                    description: Codigo del producto
+                  price:
+                    type: Number
+                    description: Precio del producto
+                  status:
+                    type: Boolean
+                    description: Status
+                  stock:
+                    type: Number
+                    description:  Cantidad de stock
+                  category:
+                    type: String
+                    description: Categoria del producto
+                  thumbnails:
+                    type: String
+                    description: Imagen
+                  owner:
+                    type: String
+                    description: Owner
+        '500':
+          description: Error interno del Server
+          content: 
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: false
+                  msg:
+                    type: Datos Incorrectos
+    post:
+      summary: Cargar un Product
+      tags:
+        - Product
+      requestBody:
+        required: true
+        content: 
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: Titulo del producto
+                description:
+                  type: String
+                  description: Descripcion del producto
+                code:
+                  type: String
+                  description: Codigo del producto
+                price:
+                  type: Number
+                  description: Precio del producto
+                stock:
+                  type: Number
+                  description:  Cantidad de stock
+                category:
+                  type: String
+                  description: Categoria del producto
+      responses:
+        '200':
+          description: Los productos se muestran correctamente
+          content:
+            application/json:
+              schema:
+                type: Object
+                properties:
+                  title:
+                    type: String
+                    description: Titulo del producto
+                  description:
+                    type: String
+                    description: Descripcion del producto
+                  code:
+                    type: String
+                    description: Codigo del producto
+                  price:
+                    type: Number
+                    description: Precio del producto
+                  status:
+                    type: Boolean
+                    description: Status
+                  stock:
+                    type: Number
+                    description:  Cantidad de stock
+                  category:
+                    type: String
+                    description: Categoria del producto
+                  thumbnails:
+                    type: String
+                    description: Imagen
+                  owner:
+                    type: String
+                    description: Owner
+        '500':
+          description: Error interno del Server
+          content: 
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: false
+                  msg:
+                    type: Datos Incorrectos
+  /api/session/products/{pid}:
+    get:
+      summary: Un producto en particular
+      tags:
+        - Product
+      parameters:
+      - name: pid
+        in: path
+        required: true
+        description: ID del producto que se solicita
+        schema:
+          type: string
+      responses:
+        '200':
+          description: El producto fue devuelto satisfactoriamente
+        '500':
+          description: Error interno del server
+        '404':
+          description: No se encontro el producto
+    put:
+      summary: Modificar un producto en particular
+      tags:
+        - Product
+      requestBody:
+        required: true
+        content: 
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: Titulo del producto
+                description:
+                  type: String
+                  description: Descripcion del producto
+                code:
+                  type: String
+                  description: Codigo del producto
+                price:
+                  type: Number
+                  description: Precio del producto
+                stock:
+                  type: Number
+                  description:  Cantidad de stock
+                category:
+                  type: String
+                  description: Categoria del producto
+      responses:
+        '200':
+          description: El producto se modifico correctamente
+          content:
+            application/json:
+              schema:
+                type: Object
+                properties:
+                  title:
+                    type: String
+                    description: Titulo del producto
+                  description:
+                    type: String
+                    description: Descripcion del producto
+                  code:
+                    type: String
+                    description: Codigo del producto
+                  price:
+                    type: Number
+                    description: Precio del producto
+                  status:
+                    type: Boolean
+                    description: Status
+                  stock:
+                    type: Number
+                    description:  Cantidad de stock
+                  category:
+                    type: String
+                    description: Categoria del producto
+                  thumbnails:
+                    type: String
+                    description: Imagen
+                  owner:
+                    type: String
+                    description: Owner
+        '500':
+          description: Error interno del Server
+          content: 
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: false
+                  msg:
+                    type: Datos Incorrectos
+    delete:
+      summary: Borrar un producto en particular
+      tags:
+        - Product
+      requestBody:
+        required: true
+        content: 
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: Titulo del producto
+                description:
+                  type: String
+                  description: Descripcion del producto
+                code:
+                  type: String
+                  description: Codigo del producto
+                price:
+                  type: Number
+                  description: Precio del producto
+                stock:
+                  type: Number
+                  description:  Cantidad de stock
+                category:
+                  type: String
+                  description: Categoria del producto
+      responses:
+        '200':
+          description: El producto se elimino correctamente
+          content:
+            application/json:
+              schema:
+                type: Object
+                properties:
+                  title:
+                    type: String
+                    description: Titulo del producto
+                  description:
+                    type: String
+                    description: Descripcion del producto
+                  code:
+                    type: String
+                    description: Codigo del producto
+                  price:
+                    type: Number
+                    description: Precio del producto
+                  status:
+                    type: Boolean
+                    description: Status
+                  stock:
+                    type: Number
+                    description:  Cantidad de stock
+                  category:
+                    type: String
+                    description: Categoria del producto
+                  thumbnails:
+                    type: String
+                    description: Imagen
+                  owner:
+                    type: String
+                    description: Owner
+        '500':
+          description: Error interno del Server
+          content: 
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: false
+                  msg:
+                    type: Datos Incorrectos
