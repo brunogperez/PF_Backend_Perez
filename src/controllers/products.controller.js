@@ -1,8 +1,8 @@
 import { productsService } from '../services/index.js'
-import { cloudinary } from '../config/cloudinary.js';
+import { cloudinary } from '../config/cloudinary.js'
 import { validFileExtension } from '../utils/validFileExtension.js'
-import { faker } from '@faker-js/faker';
-import { logger } from '../utils/logger.js';
+import { faker } from '@faker-js/faker'
+import { logger } from '../utils/logger.js'
 
 
 export const addProduct = async (req, res) => {
@@ -18,7 +18,7 @@ export const addProduct = async (req, res) => {
       const isValidExtension = validFileExtension(req.file.originalname)
 
       if (!isValidExtension)
-        return res.status(400).json({ msg: 'La extension no es valida' })
+        return res.status(400).json({ msg: 'La extensión del archivo no es valida, [png -jpg -jpeg]' })
 
       const { secure_url } = await cloudinary.uploader.upload(req.file.path)
 
@@ -38,8 +38,8 @@ export const addProduct = async (req, res) => {
 
 export const getProducts = async (req, res) => {
   try {
-    const result = await productsService.getProducts({ ...req.query });
-    return res.json({ result });
+    const result = await productsService.getProducts({ ...req.query })
+    return res.json({ result })
   } catch (error) {
     return res.status(500).json({ msg: 'Hablar con admin' })
   }
@@ -59,33 +59,33 @@ export const getProductById = async (req, res) => {
 
 export const updateProduct = async (req, res) => {
   try {
-    const { pid } = req.params;
-    const { _id, ...rest } = req.body;
+    const { pid } = req.params
+    const { _id, ...rest } = req.body
 
-    const product = await productsService.getProductById(pid);
+    const product = await productsService.getProductById(pid)
 
     if (!product)
       return res.status(404).json({ msg: `El producto con Id ${pid} no existe!` })
 
     if (req.file) {
 
-      const isValidExtension = validFileExtension(req.file.originalname);
+      const isValidExtension = validFileExtension(req.file.originalname)
 
       if (!isValidExtension)
-        return res.status(400).json({ msg: 'La extension no es valida' });
+        return res.status(400).json({ msg: 'La extensión no es valida' })
 
       if (product.thumbnails) {
-        const url = product.thumbnails.split('/');
-        const nombre = url[url.length - 1];
-        const [id] = nombre.split('.');
-        cloudinary.uploader.destroy(id);
+        const url = product.thumbnails.split('/')
+        const nombre = url[url.length - 1]
+        const [id] = nombre.split('.')
+        cloudinary.uploader.destroy(id)
       }
 
-      const { secure_url } = await cloudinary.uploader.upload(req.file.path);
-      rest.thumbnails = secure_url;
-    };
+      const { secure_url } = await cloudinary.uploader.upload(req.file.path)
+      rest.thumbnails = secure_url
+    }
 
-    const producto = await productsService.updateProduct(pid, rest);
+    const producto = await productsService.updateProduct(pid, rest)
 
     if (producto)
       return res.json({ msg: 'Producto actualizado', producto })
@@ -113,7 +113,7 @@ export const deleteProduct = async (req, res) => {
     }
 
     const product = await productsService.deleteProduct(pid)
-    //cloudinary.uploader.destroy(pid);
+    //cloudinary.uploader.destroy(pid)
 
     if (product)
       return res.json({ msg: 'Producto Eliminado', product })
@@ -126,7 +126,7 @@ export const deleteProduct = async (req, res) => {
 
 export const mockingProducts = async (req, res) => {
   try {
-    faker.location = 'es';
+    faker.location = 'es'
     const products = Array.from({ length: 100 }, (_, index) => ({
       _id: faker.string.uuid(),
       title: faker.commerce.productName(),

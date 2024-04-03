@@ -18,6 +18,8 @@ export default class Users {
     return userModel.updateOne({ _id: user._id }, { $set: updateObj })
   }
 
-  deleteUsers = async (filter) => await userModel.deleteMany(filter)
+  deleteUsers = async (filter) => {
+    await userModel.deleteMany(filter)
+  }
   
 }

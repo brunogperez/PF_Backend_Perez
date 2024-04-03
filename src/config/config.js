@@ -18,3 +18,5 @@ export const CLOUD_NAME = process.env.CLOUD_NAME
 export const CLOUD_API_KEY = process.env.CLOUD_API_KEY
 export const CLOUD_API_SECRET = process.env.CLOUD_API_SECRET
 export const URL_RESET_PASS = process.env.URL_RESET_PASS
+export const URL_HOME_FRONT = process.env.URL_HOME_FRONT
+export const ACCESS_TOKEN_MP = process.env.ACCESS_TOKEN_MP

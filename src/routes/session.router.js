@@ -17,7 +17,7 @@ import { existEmail } from '../utils/dbValidator.js'
 const router = Router()
 
 router.get('/users', [
-  validarJWT,
+  
   
 ], getUsers)
 

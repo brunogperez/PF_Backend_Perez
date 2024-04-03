@@ -147,14 +147,13 @@ export const getUsers = async (req, res) => {
 
 export const deleteUsers = async (req, res) => {
   try {
-
-
     const inactive = new Date()
     inactive.setHours(inactive.getHours() - 48)
-    const deleteuUsers = await usersService.deleteUsers({ last_login: { $lt: inactive } })
-    
-
-    res.status(200).json({ ok: true, msg: 'Usuarios eliminados correctamente', deleteuUsers })
+    const deleteUsers = await usersService.deleteUsers({ last_login: { $lt: inactive } })
+/* 
+    await getUsers(deleteUsers)
+ */
+    res.status(200).json({ ok: true, msg: 'Usuarios eliminados correctamente', deleteUsers })
 
   } catch (error) {
     logger.error(error)

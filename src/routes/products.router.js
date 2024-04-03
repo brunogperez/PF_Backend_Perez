@@ -11,7 +11,6 @@ router.get('/', getProducts);
 
 router.get('/:pid', [
   validarJWT,
-  isAdmin,
   check('pid', 'ID inválido').isMongoId(),
   validateFields
 ], getProductById)
@@ -35,7 +34,6 @@ router.post('/', [
 
 router.put('/:pid', [
   validarJWT,
-  isAdmin,
   check('pid', 'ID inválido').isMongoId(),
   check('pid').custom(existProduct),
   validateFields,
@@ -44,7 +42,6 @@ router.put('/:pid', [
 
 router.delete('/:pid', [
   validarJWT,
-  isAdmin,
   check('pid', 'ID inválido').isMongoId(),
   check('pid').custom(existProduct),
   validateFields], deleteProduct)

@@ -14,7 +14,7 @@ switch (PERSISTENCE) {
     const { default: ProductsMongo } = await import('./mongo/products.mongo.js')
     const { default: UsersMongo } = await import('./mongo/users.mongo.js')
     const { default: MessagesMongo } = await import('./mongo/messages.mongo.js')
-    const { default: TicketsMongo } = await import('./mongo/tickets.mongo.js')
+    const { default: TicketsMongo } = await import('./mongo/ticket.mongo.js')
 
     Carts = CartsMongo
     Products = ProductsMongo

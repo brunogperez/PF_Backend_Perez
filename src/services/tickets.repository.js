@@ -2,9 +2,8 @@ export default class TicketsRepository {
   constructor(dao) {
     this.dao = dao
   }
-  getTicketById = async (id) => this.dao.findById(id)
-
-  getTicketByEmail = async (email) => this.dao.findOne(email)
-
-  createTicket = async (ticket) => this.dao.createTicket(ticket)
+  getTicketById = async (id) => await this.dao.getTicketById(id)
+  getTicketByEmail = async (email) => await this.dao.getTicketByEmail(email)
+  getTicketsByEmail = async (email) => await this.dao.getTicketsByEmail(email)
+  createTicket = async (ticket) => await this.dao.createTicket(ticket)
 }

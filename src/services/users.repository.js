@@ -13,7 +13,6 @@ export default class UsersRepository {
 
   createUser = async (user) => await this.dao.createUser(user)
 
-
   changeUserPassword = async (user, password) =>  await this.dao.updateUser(user, password)
 
   switchRole = async (user) => {
