@@ -145,14 +145,38 @@ export const getUsers = async (req, res) => {
   }
 }
 
+export const deleteUser = async (req, res) => {
+  try {
+
+    const { id } = req.params
+
+    console.log(id)
+
+    const user = await usersService.getUserById(id)
+
+    
+    if (!user) return res.status(400).json({ ok: false, msg: 'El usuario no existe' })
+
+    const deletedUser = await usersService.deleteUser(id)
+
+    /*  const users = await getUsers(deleteUser) */
+
+    res.status(200).json({ ok: true, msg: 'Usuario eliminado correctamente', deletedUser })
+
+  } catch (error) {
+    logger.error(error)
+    res.status(500).json({ ok: false, msg: 'Contactar al soporte' })
+  }
+}
+
 export const deleteUsers = async (req, res) => {
   try {
     const inactive = new Date()
     inactive.setHours(inactive.getHours() - 48)
     const deleteUsers = await usersService.deleteUsers({ last_login: { $lt: inactive } })
-/* 
-    await getUsers(deleteUsers)
- */
+    /* 
+        await getUsers(deleteUsers)
+     */
     res.status(200).json({ ok: true, msg: 'Usuarios eliminados correctamente', deleteUsers })
 
   } catch (error) {

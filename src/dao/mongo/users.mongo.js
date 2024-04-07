@@ -17,6 +17,8 @@ export default class Users {
     updateObj[field] = value
     return userModel.updateOne({ _id: user._id }, { $set: updateObj })
   }
+  
+  deleteUser = async (id) => await userModel.findByIdAndDelete(id)
 
   deleteUsers = async (filter) => {
     await userModel.deleteMany(filter)

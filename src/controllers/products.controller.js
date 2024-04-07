@@ -32,7 +32,7 @@ export const addProduct = async (req, res) => {
 
   } catch (error) {
     logger.error(error)
-    return res.status(500).json({ msg: "Hablar con admin" })
+    return res.status(500).json({ msg: 'Contacta al soporte' })
   }
 }
 
@@ -41,7 +41,7 @@ export const getProducts = async (req, res) => {
     const result = await productsService.getProducts({ ...req.query })
     return res.json({ result })
   } catch (error) {
-    return res.status(500).json({ msg: 'Hablar con admin' })
+    return res.status(500).json({ msg: 'Contacta al soporte' })
   }
 }
 
@@ -53,7 +53,7 @@ export const getProductById = async (req, res) => {
       return res.status(404).json({ msg: `El producto con id ${pid} no existe` })
     return res.json({ product })
   } catch (error) {
-    return res.status(500).json({ msg: 'Hablar con admin' })
+    return res.status(500).json({ msg: 'Contacta al soporte' })
   }
 }
 
@@ -91,7 +91,7 @@ export const updateProduct = async (req, res) => {
       return res.json({ msg: 'Producto actualizado', producto })
     return res.status(404).json({ msg: `No se pudo actualizar el producto con ${pid}` })
   } catch (error) {
-    return res.status(500).json({ msg: "Hablar con admin" })
+    return res.status(500).json({ msg: 'Contacta al soporte' })
   }
 }
 
@@ -120,7 +120,7 @@ export const deleteProduct = async (req, res) => {
     return res.status(404).json({ msg: `No se pudo eliminar el producto con ${pid}` })
   } catch (error) {
     logger.error('deleteProduct ->', error)
-    return res.status(500).json({ msg: "Hablar con admin" })
+    return res.status(500).json({ msg: 'Contacta al soporte' })
   }
 }
 

@@ -6,7 +6,8 @@ import {
   updateProductsInCart,
   deleteCartProducts,
   purchaseCart,
-  deleteProductsInCart
+  deleteProductsInCart,
+  createIdPreference
 } from '../controllers/carts.controller.js'
 import { validarJWT, validateFields } from '../middlewares/auth.middlewares.js'
 import { existCart } from '../utils/dbValidator.js'
@@ -51,6 +52,15 @@ router.post('/:cid/purchase',[
   check('cid').custom(existCart),
   validateFields
 ], purchaseCart)
+
+
+router.post('/create-preference/:cid',[
+  validarJWT,
+  check('cid', 'No es valido el ID del carrito').isMongoId(),
+  check('cid').custom(existCart),
+  validateFields,
+], createIdPreference)
+
 
 
 export default router

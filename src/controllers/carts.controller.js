@@ -2,6 +2,8 @@ import { cartsService, productsService, ticketsService, usersService } from '../
 import { v4 as uuidv4 } from 'uuid'
 import { logger } from '../utils/logger.js'
 import { sendEmailTicket } from '../utils/sendEmail.js'
+import { ACCESS_TOKEN_MP, URL_HOME_FRONT } from '../config/config.js'
+import { MercadoPagoConfig, Preference } from 'mercadopago'
 
 export const getCartById = async (req, res) => {
   try {
@@ -38,7 +40,7 @@ export const addProductsInCart = async (req, res) => {
   try {
     const { _id } = req
     const { cid, pid } = req.params
-    
+
     const user = await usersService.getUserById(_id)
 
     if (!user) return res.status(400).json({ ok: false, msg: 'Usuario no existe!' })
@@ -51,8 +53,8 @@ export const addProductsInCart = async (req, res) => {
 
     const cart = await cartsService.addProductsInCart(cid, pid)
 
-   /*  if (!cart) return res.status(404).json({ msg: `El cart con id ${cid} no existe!` })
- */
+    /*  if (!cart) return res.status(404).json({ msg: `El cart con id ${cid} no existe!` })
+  */
     return res.json({ msg: 'Carrito actualizado!', cart })
 
   } catch (error) {
@@ -89,7 +91,7 @@ export const updateProductsInCart = async (req, res) => {
     return res.json({ msg: 'Producto actualizado en el cart', cart })
 
   } catch (error) {
-    return res.status(500).json({ msg: 'Hablar con admin' })
+    return res.status(500).json({ msg: 'Contacta al soporte' })
   }
 }
 
@@ -113,7 +115,7 @@ export const deleteProductsInCart = async (req, res) => {
     return res.json({ msg: 'Producto eliminado del cart', cart })
 
   } catch (error) {
-    return res.status(500).json({ msg: 'Hablar con admin' })
+    return res.status(500).json({ msg: 'Contacta al soporte' })
   }
 }
 
@@ -136,7 +138,7 @@ export const deleteCartProducts = async (req, res) => {
     return res.json({ msg: 'Productos eliminados del cart', cart })
 
   } catch (error) {
-    return res.status(500).json({ msg: 'Hablar con admin' })
+    return res.status(500).json({ msg: 'Contacta al soporte' })
   }
 }
 
@@ -179,11 +181,86 @@ export const purchaseCart = async (req, res) => {
     // enviar email del recibo de la compra
     sendEmailTicket(user.email, code, user.first_name, items, amount)
 
-    await cartsService.deleteCartProducts(user.cart_id)
+    await cartsService.deleteCartProducts(cid)
 
     return res.json({ ok: true, msg: 'Compra generada', ticket: { code, cliente: purchase, items, amount } })
   } catch (error) {
     logger.error(error)
-    return res.status(500).json({ msg: "Hablar con admin" })
+    return res.status(500).json({ msg: 'Contacta al soporte' })
   }
 }
+
+
+export const createIdPreference = async (req = request, res = response) => {
+  try {
+    const { _id } = req;
+    const { cid } = req.params
+
+    const client = new MercadoPagoConfig({
+      accessToken: ACCESS_TOKEN_MP,
+    })
+
+    const cart = await cartsService.getCartById(cid)
+
+    const items = cart.products.map(item => {
+      return {
+        title: item.id.title,
+        unit_price: Number(item.id.price),
+        quantity: Number(item.quantity),
+        currency_id: 'ARS'
+      }
+    });
+
+    const back_urls = {
+      success: URL_HOME_FRONT,
+      failure: URL_HOME_FRONT,
+      pending: URL_HOME_FRONT,
+    };
+
+    const body = {
+      items: items,
+      back_urls: back_urls,
+      auto_return: 'approved'
+    }
+
+    const preference = new Preference(client);
+    const result = await preference.create({ body });
+
+    return res.json({ ok: true, idPreference: result.id });
+  } catch (error) {
+    logger.error(error);
+    res.status(500).json({ ok: false, msg: 'Error del servidor' })
+  }
+};
+
+/* 
+
+app.post('/payment-intent', async (req, res) => {
+  try {
+    const body = {
+      items: [
+        {
+          title: req.body.title,
+          quantity: Number(req.body.quantity),
+          unit_price: Number(req.body.price),
+          currency_id: 'ARS',
+        },
+      ],
+      back_urls: {
+    
+      },
+      auto_return: 'approved'
+    }
+
+    const preference = new Preference(client)
+
+    const result = await preference.create({ body })
+
+    return res.json({ id: result.id })
+
+  } catch (error) {
+    console.log(error)
+    
+  }
+})
+ */

@@ -11,13 +11,15 @@ import productsRouter from './routes/products.router.js'
 import cartsRouter from './routes/carts.router.js'
 import sessionRouter from './routes/session.router.js'
 import ticketsRouter from './routes/tickets.router.js'
+import chatRouter from './routes/chat.router.js'
 
 //UTLIDADES
 import __dirname from './utils.js'
 import { logger } from './utils/logger.js'
-import { ACCESS_TOKEN_MP, PORT, URL_HOME_FRONT } from './config/config.js'
+import { PORT } from './config/config.js'
 import { requestUrl } from './middlewares/logger.middlewares.js'
-import { MercadoPagoConfig, Preference } from 'mercadopago'
+import { Server } from 'socket.io'
+import http from 'http'
 
 
 const app = express()
@@ -37,7 +39,7 @@ const swaggerOptions = {
     }
   },
   apis: [`${__dirname}/docs/**/*.yaml`],
-};
+}
 const spec = swaggerJsDoc(swaggerOptions)
 
 
@@ -46,45 +48,32 @@ app.use('/api/session', sessionRouter)
 app.use('/api/products', productsRouter)
 app.use('/api/carts', cartsRouter)
 app.use('/api/tickets', ticketsRouter)
+app.use('api/chat', chatRouter)
 app.use('/api-docs', swaggerUiExpress.serve, swaggerUiExpress.setup(spec))
 
 
 await mongoDBConnection()
-app.listen(PORT, () => logger.info(`Listening on port: ${PORT}`))
 
-
-
-const client = new MercadoPagoConfig({
-  accessToken: ACCESS_TOKEN_MP,
-})
-
-app.post('/payment-intent', async (req, res) => {
-  try {
-    const body = {
-      items: [
-        {
-          title: req.body.title,
-          quantity: Number(req.body.quantity),
-          unit_price: Number(req.body.price),
-          currency_id: 'ARS',
-        },
-      ],
-      back_urls: {
-        success: URL_HOME_FRONT,
-        failure: URL_HOME_FRONT,
-        pending: URL_HOME_FRONT,
-      },
-      auto_return: 'approved'
+const server = http.createServer(app)
+const io = new Server(server, {
+    cors: {
+        origin: 'http://localhost:5173'
     }
-
-    const preference = new Preference(client)
-
-    const result = await preference.create({body})
-
-    return res.json({id: result.id})
-
-  } catch (error) {
-    console.log(error)
-    res.status(500).json({ok:false , msg: 'Error del servidor'})
-  }
 })
+
+
+io.on('connection', socket => {
+    console.log('Client conected')
+
+    socket.on('mensaje', data => {
+        console.log({ data })
+
+        socket.broadcast.emit('mensaje', data)
+    })
+})
+
+
+//app.listen(PORT, () => logger.info(`Listening on port: ${PORT}`))
+
+server.listen(PORT, () => logger.info(`Listening on port: ${PORT}`))
+

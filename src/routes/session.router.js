@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import {
   changePassword,
+  deleteUser,
   deleteUsers,
   getUsers,
   resetPassword,
@@ -59,6 +60,8 @@ router.post('/reset-password', [
   check('password', 'La contraseña debe tener al menos 6 caracteres').isLength({ min: 6 }),
   validateFields
 ], resetPassword)
+
+router.post('/delete-user/:id', [], deleteUser)
 
 router.post('/delete-users', [], deleteUsers)
 

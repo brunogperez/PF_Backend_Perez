@@ -7,9 +7,7 @@ export default class UsersRepository {
 
   getUserById = async (id) => await this.dao.getUserById(id)
 
-
   getUserByEmail = async (email) =>  await this.dao.getUserByEmail(email)
-
 
   createUser = async (user) => await this.dao.createUser(user)
 
@@ -20,6 +18,8 @@ export default class UsersRepository {
     const result = await this.dao.updateUser(user, role, "role")
     return result
   }
+
+  deleteUser = async (id) => await this.dao.deleteUser(id)
 
   deleteUsers = async (filter) => await this.dao.deleteUsers(filter)
 }

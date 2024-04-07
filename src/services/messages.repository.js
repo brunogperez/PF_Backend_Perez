@@ -7,4 +7,4 @@ export default class MessagesRepository {
   
   createMessage = async (user, message) => await this.dao.createMessage(user, message)
 
-}
+} 
