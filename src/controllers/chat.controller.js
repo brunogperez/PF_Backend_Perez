@@ -1,5 +1,5 @@
 import { messagesService } from '../services/index.js'
-import { logger } from '../utils/logger'
+import { logger } from '../utils/logger.js'
 
 export const getMessages = async (req, res) => {
   try {
