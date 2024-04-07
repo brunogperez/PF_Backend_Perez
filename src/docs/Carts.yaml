@@ -1,0 +1,113 @@
+paths: 
+  /api/session/carts/{cid}:
+    get:
+      summary: Carrito
+      tags:
+        - Cart
+      parameters:
+      - name: cid
+        in: path
+        required: true
+        description: ID del carrito que se solicita
+        schema:
+          type: string
+      responses:
+        '200':
+          description: El carrito fue devuelto satisfactoriamente
+        '500':
+          description: Error interno del server
+        '404':
+          description: No se encontro el carrito
+  /api/session/carts/{cid}/product/{pid}:
+    post:
+      summary: Un producto particular del carrito
+      tags:
+        - Cart
+      parameters:
+      - name: cid
+        in: path
+        required: true
+        description: ID del carrito que se solicita
+        schema:
+          type: string
+      - name: pid
+        in: path
+        required: true
+        description: ID del producto que se solicita
+        schema:
+          type: string
+      responses:
+        '200':
+          description: El producto del carrito fue devuelto satisfactoriamente
+        '500':
+          description: Error interno del server
+        '404':
+          description: No se encontro el carrito o el producto
+  /api/session/carts/{cid}/products/{pid}:
+    delete:
+      summary: Borrar un producto particular del carrito
+      tags:
+        - Cart
+      parameters:
+      - name: cid
+        in: path
+        required: true
+        description: ID del carrito que se solicita
+        schema:
+          type: string
+      - name: pid
+        in: path
+        required: true
+        description: ID del producto que se solicita
+        schema:
+          type: string
+      responses:
+        '200':
+          description: El producto del carrito fue eliminado satisfactoriamente
+        '500':
+          description: Error interno del server
+        '404':
+          description: No se encontro el carrito o el producto
+    put:
+      summary: Modificar un producto particular del carrito
+      tags:
+        - Cart
+      parameters:
+      - name: cid
+        in: path
+        required: true
+        description: ID del carrito que se solicita
+        schema:
+          type: string
+      - name: pid
+        in: path
+        required: true
+        description: ID del producto que se solicita
+        schema:
+          type: string
+      responses:
+        '200':
+          description: El producto del carrito fue modificado satisfactoriamente
+        '500':
+          description: Error interno del server
+        '404':
+          description: No se encontro el carrito o el producto
+  /api/session/carts/{cid}/purchase:
+    post:
+      summary: Comprar productos del carrito
+      tags:
+        - Cart
+      parameters:
+      - name: cid
+        in: path
+        required: true
+        description: ID del carrito que se solicita
+        schema:
+          type: string
+      responses:
+        '200':
+          description: La compra se ejecuto satisfactoriamente
+        '500':
+          description: Error interno del server
+        '404':
+          description: No se encontro el carrito

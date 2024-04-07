@@ -1,0 +1,72 @@
+paths: 
+  /api/session/login:
+    post:
+      summary: Iniciar sesión en la aplicación
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content: 
+          application/json:
+            schema:
+              type: object
+              properties:
+                email: 
+                  type: string
+                  description: Correo electrónico del usuario
+                password:
+                  type: string
+                  description: Contraseña del usuario
+      responses:
+        '200':
+          description: Inicio de sesión correcto
+          content:
+            application/json:
+              schema:
+                user:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                    first_name:
+                      type: string
+                    last_name:
+                      type: string
+                    email:
+                      type: string
+                    password:
+                      type: string
+                    role:
+                      type: string
+                    status:
+                      type: boolean
+                    cart_id:
+                      type: string
+                token:
+                  type: string
+        '400':
+          description: Datos invalidos
+          content: 
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: false
+                  msg:
+                    type: Datos Incorrectos
+  /api/session/register:
+    post:
+      summary: Registrar un usuario
+      tags:
+        - Users
+  /api/session/change-password:
+    post:
+      summary: Solicitar cambio de contraseña
+      tags:
+        - Users
+  /api/session/reset-password:
+    get:
+      summary: Cambiar contraseña
+      tags:
+        - Users
