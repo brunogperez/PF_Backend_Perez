@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang='en'>
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="/css/style.css">
+  <meta charset='UTF-8'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+  <link rel='stylesheet' href='/css/style.css'>
   <title>Ecommerce CoderHouse</title>
 </head>
 
@@ -53,12 +53,31 @@
       </ul>
     </div>
     <div class='endpoint-details'>
-      <h2>/api/session/register (POST)</h2>
+      <h2>/api/session/reset-password (POST)</h2>
       <p>Endpoint para cambiar la contraseña.</p>
       <p>Parámetros:</p>
       <ul>
         <li>email (String)<span class='required'> requerido </span>: El email del usuario.</li>
-        <li>password (String)<span class='required'> requerido </span>: La contraseña del usuario (min de caracteres 6).</li>
+        <li>password (String)<span class='required'> requerido </span>: La contraseña del usuario (min de caracteres 6).
+        </li>
+      </ul>
+    </div>
+    <div class='endpoint-details'>
+      <h2>/api/session/delete-user (POST)</h2>
+      <p>Endpoint para eliminar un usuario.</p>
+      <p>Parámetros:</p>
+      <ul>
+        <li>email (String)<span class='required'> requerido </span>: El email del usuario.</li>
+        <li>password (String)<span class='required'> requerido </span>: La contraseña del usuario (min de caracteres 6).
+        </li>
+      </ul>
+    </div>
+    <div class='endpoint-details'>
+      <h2>/api/session/delete-users (POST)</h2>
+      <p>Endpoint para eliminar los usuarios inactivos.</p>
+      <p>Parámetros:</p>
+      <ul>
+        <li>email (String)<span class='required'> requerido </span>: El email del usuario.</li>
       </ul>
     </div>
   </details>
@@ -181,7 +200,6 @@
         <li>quantity (Number)<span class='required'> requerido </span>: Cantidad del producto.</li>
       </ul>
     </div>
-
     <div class='endpoint-details'>
       <h2>/api/carts/:cid/purchase (POST)</h2>
       <p>Endpoint para obtener productos.</p>
@@ -192,8 +210,43 @@
       </ul>
     </div>
   </details>
+  <details>
+    <summary>Tickets</summary>
+    <div class='endpoint-details'>
+      <h2>/api/session/tickets (GET)</h2>
+      <p>Endpoint para obtener el ticket de compra.</p>
+      <p>Parámetros:</p>
+      <ul>
+        <li>code (String)<span class='required'> requerido </span>: el code es obligatorio.</li>
+        <li>purchase_datetime (Date): Date de la compra.</li>
+        <li>amount (Number)<span class='required'> requerido </span>: El amount (total de la compra) es obligatorio.
+        </li>
+        <li>purchase (String)<span class='required'> requerido </span>: El purchase (email) es obligatorio.</li>
+        <li>items (Object)<span class='required'> requerido </span>: La propiedad items es obligatoria.</li>
+      </ul>
+    </div>
+  </details>
+  <details>
+    <summary>Chat</summary>
+    <div class='endpoint-details'>
+      <h2>/api/chat (GET)</h2>
+      <p>Endpoint para Chat.</p>
+      <p>Parámetros:</p>
+      <ul>
+        <li>user (String): El usuario o Id.</li>
+      </ul>
+    </div>
+    <div class='endpoint-details'>
+      <h2>/api/chat (POST)</h2>
+      <p>Endpoint  enviar un mensaje para Chat.</p>
+      <p>Parámetros:</p>
+      <ul>
+        <li>user (String): El user / usuario o Id.</li>
+        <li>message (String): El mensaje.</li>
+      </ul>
+    </div>
+  </details>
   </main>
-
 </body>
 
 </html>

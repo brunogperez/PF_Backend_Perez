@@ -3,11 +3,16 @@ import {
     getMessages,
     createMessage
 } from '../controllers/chat.controller.js'
+import { validarJWT } from '../middlewares/auth.middlewares.js'
 
 const router = Router()
 
-router.get('/', getMessages)
+router.get('/', [
+    validarJWT
+], getMessages)
 
-router.post('/',createMessage)
+router.post('/', [
+    validarJWT
+], createMessage)
 
 export default router

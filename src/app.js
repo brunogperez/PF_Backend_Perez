@@ -48,7 +48,7 @@ app.use('/api/session', sessionRouter)
 app.use('/api/products', productsRouter)
 app.use('/api/carts', cartsRouter)
 app.use('/api/tickets', ticketsRouter)
-app.use('api/chat', chatRouter)
+app.use('/api/chat', chatRouter)
 app.use('/api-docs', swaggerUiExpress.serve, swaggerUiExpress.setup(spec))
 
 

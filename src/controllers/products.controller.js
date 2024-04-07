@@ -113,7 +113,6 @@ export const deleteProduct = async (req, res) => {
     }
 
     const product = await productsService.deleteProduct(pid)
-    //cloudinary.uploader.destroy(pid)
 
     if (product)
       return res.json({ msg: 'Producto Eliminado', product })

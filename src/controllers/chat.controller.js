@@ -11,10 +11,19 @@ export const getMessages = async (req, res) => {
   }
 }
 
-export const createMessage = async () => {
+export const createMessage = async (req, res) => {
+
   try {
-    const message = await messagesService.createMessage()
-    return res.json({ message })
+
+    const { first_name, last_name } = req
+    const { message } = req.body
+
+    const fullName = first_name + ' ' + last_name
+
+    const result = await messagesService.createMessage(fullName, message)
+
+    return res.json({ result })
+
   } catch (error) {
     logger.error(error)
     return res.status(500).json({ msg: 'Contacta al soporte' })

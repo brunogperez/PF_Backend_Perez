@@ -17,10 +17,7 @@ import { existEmail } from '../utils/dbValidator.js'
 
 const router = Router()
 
-router.get('/users', [
-  
-  
-], getUsers)
+router.get('/users', getUsers)
 
 router.post('/login', [
   check('email', 'El email es obligatorio').not().isEmpty(),
