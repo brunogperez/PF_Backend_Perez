@@ -24,7 +24,7 @@ frontend -- npm run dev
 
 ## URL de los deploys 
 
-* [URL de frotend](https://pf-backend-front-perezbruno.netlify.app/)
+* [URL de frontend](https://pf-backend-front-perezbruno.netlify.app/)
 * [URL de backend](https://pf-backend-perez.onrender.com/)
 
 
@@ -35,7 +35,8 @@ Mi proyecto fue construido utilizando las siguientes herramientas:
 * GitHub
 * Node.JS
 * MongoDB
-* Express
+* ExpressJS
+* Socket.io
 * React+Vite
 * Bootstrap / Bootstrap-React /
 * Render
