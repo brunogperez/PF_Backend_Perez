@@ -38,7 +38,7 @@ Mi proyecto fue construido utilizando las siguientes herramientas:
 * ExpressJS
 * Socket.io
 * React+Vite
-* Bootstrap / Bootstrap-React /
+* MaterialUI
 * Render
 * Netlify
 * MercadoPago
