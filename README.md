@@ -24,8 +24,8 @@ frontend -- npm run dev
 
 ## URL de los deploys 
 
-_[URL de frotend](https://pf-backend-front-perezbruno.netlify.app/)
-_[URL de backend](https://pf-backend-perez.onrender.com/)
+* [URL de frotend](https://pf-backend-front-perezbruno.netlify.app/)
+* [URL de backend](https://pf-backend-perez.onrender.com/)
 
 
 ## Construido con 🛠️
