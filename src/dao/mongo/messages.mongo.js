@@ -1,10 +1,16 @@
-import messageModel from './models/messages.model.js'
+import messageModel from "./models/messages.model.js";
 
 export default class Messages {
-  constructor() { }
+  constructor() {}
 
-  getMessages = async () => messageModel.find().lean().exec()
+  getMessages = async () => messageModel.find().lean().exec();
 
-  createMessage = async (user, message) => messageModel.create({ user, message })
+  createMessage = async (user, message) =>
+    messageModel.create({ user, message });
+
+  deleteAllMessages = async () => {
+    return messageModel.deleteMany({});
+  };
+
   
 }

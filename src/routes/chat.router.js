@@ -1,18 +1,20 @@
-import { Router } from 'express'
+import { Router } from "express";
 import {
-    getMessages,
-    createMessage
-} from '../controllers/chat.controller.js'
-import { validarJWT } from '../middlewares/auth.middlewares.js'
+  getMessages,
+  createMessage,
+  deleteMessage,
+  deleteAllMessages,
+} from "../controllers/chat.controller.js";
+import { validarJWT } from "../middlewares/auth.middlewares.js";
 
-const router = Router()
+const router = Router();
 
-router.get('/', [
-    validarJWT
-], getMessages)
+router.get("/", [validarJWT], getMessages);
 
-router.post('/', [
-    validarJWT
-], createMessage)
+router.post("/", [validarJWT], createMessage);
 
-export default router
+router.delete("/messages/:id", deleteMessage);
+
+router.delete("/messages", deleteAllMessages);
+
+export default router;
