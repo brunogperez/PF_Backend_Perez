@@ -1,6 +1,5 @@
 export default class MessagesRepository {
   constructor(dao) {
-
     this.dao = dao;
   }
 
@@ -8,7 +7,8 @@ export default class MessagesRepository {
 
   createMessage = async (user, message) =>
     await this.dao.createMessage(user, message);
+
   deleteMessage = async (id) => await this.dao.deleteMessage(id);
-  deleteAllMessages = async () =>
-    await this.dao.deleteAllMessages();
+  
+  deleteAllMessages = async () => await this.dao.deleteAllMessages();
 }

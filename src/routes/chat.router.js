@@ -1,4 +1,3 @@
-
 import { Router } from "express";
 import {
   getMessages,
@@ -10,12 +9,12 @@ import { validarJWT } from "../middlewares/auth.middlewares.js";
 
 const router = Router();
 
-router.get("/", [validarJWT], getMessages);
+router.get("/", getMessages);
 
-router.post("/", [validarJWT], createMessage);
+router.post("/", createMessage);
 
-router.delete("/messages/:id", deleteMessage);
+router.delete("/:id", deleteMessage);
 
-router.delete("/messages", deleteAllMessages);
+router.delete("/", deleteAllMessages);
 
 export default router;
