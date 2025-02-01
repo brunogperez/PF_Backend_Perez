@@ -55,7 +55,7 @@ await mongoDBConnection();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "https://pf-backend-front-perezbruno.netlify.app/",
+    origin: "*",
     methods: ["GET", "POST"],
   },
 });
