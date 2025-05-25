@@ -1,67 +1,70 @@
-import { Router } from 'express'
+import { Router } from 'express';
+import { check } from 'express-validator';
 import {
   changePassword,
   deleteUser,
-  deleteUsers,
   getUsers,
   resetPassword,
   revalidateToken,
   sessionLogin,
   sessionRegister,
   validateTokenPass,
-} from '../controllers/session.controller.js'
+  loginValidations,
+  registerValidations,
+  resetPasswordValidations
+} from '../controllers/session.controller.js';
 
-import { check } from 'express-validator'
-import { isAdmin, validarJWT, validateFields } from '../middlewares/auth.middlewares.js'
-import { existEmail } from '../utils/dbValidator.js'
+import { isAdmin, validarJWT } from '../middlewares/auth.middlewares.js';
+import { validateFields } from '../controllers/session.controller.js';
 
-const router = Router()
+const router = Router();
 
-router.get('/users', getUsers)
-
+// Rutas públicas
 router.post('/login', [
-  check('email', 'El email es obligatorio').not().isEmpty(),
-  check('email', 'El email tiene el formato incorrecto').isEmail(),
-  check('password', 'La contraseña es obligatorio').not().isEmpty(),
-  check('password', 'La contraseña debe tener al menos 6 caracteres').isLength({ min: 6 }),
+  ...loginValidations,
   validateFields
-], sessionLogin)
+], sessionLogin);
 
 router.post('/register', [
-  check('first_name', 'El nombre es obligatorio').not().isEmpty(),
-  check('last_name', 'El apellido es obligatorio').not().isEmpty(),
-  check('email', 'El email es obligatorio').not().isEmpty(),
-  check('email', 'El email tiene el formato incorrecto').isEmail(),
-  check('email').custom(existEmail),
-  check('password', 'La contraseña es obligatorio').not().isEmpty(),
-  check('password', 'La contraseña debe tener al menos 6 caracteres').isLength({ min: 6 }),
+  ...registerValidations,
   validateFields
-], sessionRegister)
+], sessionRegister);
 
-router.get('/renew', validarJWT, revalidateToken)
+// Ruta para renovar token
+router.get('/renew', validarJWT, revalidateToken);
 
-router.post('/change-password', [
-  check('email', 'El email es obligatorio').not().isEmpty(),
-  check('email', 'El email debe ser valido').isEmail(),
+// Rutas para restablecer contraseña
+router.post('/forgot-password', [
+  check('email', 'El email es obligatorio').isEmail(),
   validateFields
-], changePassword)
+], changePassword);
 
-router.get('/reset-password', [
-  check('token', 'El token es olbligatorio').not().isEmpty(),
+router.get('/validate-token', [
+  check('token', 'El token es obligatorio').not().isEmpty(),
   validateFields
-], validateTokenPass)
+], validateTokenPass);
 
 router.post('/reset-password', [
-  check('token', 'El token es olbligatorio').not().isEmpty(),
-  check('password', 'La contraseña es obligatorio').not().isEmpty(),
-  check('password', 'La contraseña debe tener al menos 6 caracteres').isLength({ min: 6 }),
+  ...resetPasswordValidations,
   validateFields
-], resetPassword)
+], resetPassword);
 
-router.post('/delete-user/:id', [], deleteUser)
+// Rutas protegidas para administradores
+router.get('/users', [
+  validarJWT,
+  isAdmin
+], getUsers);
 
-router.post('/delete-users', [], deleteUsers)
+router.delete('/user/:id', [
+  validarJWT,
+  isAdmin,
+  check('id', 'No es un ID válido').isMongoId(),
+  validateFields
+], deleteUser);
 
+router.delete('/inactive-users', [
+  validarJWT,
+  isAdmin
+], deleteUser);
 
-
-export default router
+export default router;

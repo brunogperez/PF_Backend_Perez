@@ -10,3 +10,12 @@ export const generateToken = (user, timeExpire = '8h') => {
     throw error
   }
 }
+
+export const generateRefreshToken = (user, timeExpire = '7d') => {
+  try {
+    return jwt.sign({ _id: user._id }, JWT_PRIVATE_KEY, { expiresIn: timeExpire })  
+  } catch (error) {
+    logger.error(error)
+    throw error
+  }
+}

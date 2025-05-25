@@ -1,113 +1,351 @@
-paths: 
-  /api/session/carts/{cid}:
+openapi: 3.0.0
+info:
+  title: API de Carritos
+  description: |
+    Esta documentación cubre los endpoints relacionados con la gestión de carritos de compra,
+    incluyendo la adición, eliminación y modificación de productos, así como el proceso de compra.
+  version: 1.0.0
+  contact:
+    name: Soporte
+    email: soporte@ecommerce.com
+
+servers:
+  - url: http://localhost:8080/api
+    description: Servidor de desarrollo
+  - url: https://api.ecommerce.com/api
+    description: Servidor de producción
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  
+  schemas:
+    CartItem:
+      type: object
+      properties:
+        product:
+          type: string
+          description: ID del producto
+          example: "507f1f77bcf86cd799439011"
+        quantity:
+          type: integer
+          minimum: 1
+          example: 2
+        price:
+          type: number
+          format: float
+          minimum: 0
+          example: 29.99
+        
+    Cart:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: "507f1f77bcf86cd799439012"
+        user:
+          type: string
+          description: ID del usuario propietario del carrito
+          example: "507f1f77bcf86cd799439013"
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CartItem'
+        total:
+          type: number
+          format: float
+          example: 59.98
+        status:
+          type: string
+          enum: ["active", "purchased", "abandoned"]
+          default: "active"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    
+    PurchaseRequest:
+      type: object
+      properties:
+        paymentMethod:
+          type: string
+          enum: ["credit_card", "debit_card", "paypal"]
+          example: "credit_card"
+        shippingAddress:
+          type: object
+          properties:
+            street:
+              type: string
+              example: "Av. Principal 123"
+            city:
+              type: string
+              example: "Buenos Aires"
+            state:
+              type: string
+              example: "Buenos Aires"
+            postalCode:
+              type: string
+              example: "C1234ABC"
+            country:
+              type: string
+              example: "Argentina"
+    
+    PurchaseResponse:
+      type: object
+      properties:
+        orderId:
+          type: string
+          example: "ord_123456789"
+        status:
+          type: string
+          example: "completed"
+        total:
+          type: number
+          format: float
+          example: 99.99
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CartItem'
+        purchaseDate:
+          type: string
+          format: date-time
+    
+    ErrorResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          example: false
+        msg:
+          type: string
+          example: "Error message describing the issue"
+
+paths:
+  /session/carts/{cid}:
     get:
-      summary: Carrito
       tags:
-        - Cart
+        - Carritos
+      summary: Obtener carrito por ID
+      description: Obtiene los detalles de un carrito específico incluyendo todos sus productos
+      operationId: getCartById
+      security:
+        - bearerAuth: []
       parameters:
-      - name: cid
-        in: path
-        required: true
-        description: ID del carrito que se solicita
-        schema:
-          type: string
+        - name: cid
+          in: path
+          required: true
+          description: ID del carrito
+          schema:
+            type: string
+            example: "507f1f77bcf86cd799439012"
       responses:
         '200':
-          description: El carrito fue devuelto satisfactoriamente
-        '500':
-          description: Error interno del server
+          description: Carrito obtenido exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: No se encontro el carrito
-  /api/session/carts/{cid}/product/{pid}:
+          description: Carrito no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  
+  /session/carts/{cid}/products/{pid}:
     post:
-      summary: Un producto particular del carrito
       tags:
-        - Cart
+        - Carritos
+      summary: Agregar producto al carrito
+      description: Agrega un producto al carrito con la cantidad especificada
+      operationId: addProductToCart
+      security:
+        - bearerAuth: []
       parameters:
-      - name: cid
-        in: path
+        - name: cid
+          in: path
+          required: true
+          description: ID del carrito
+          schema:
+            type: string
+            example: "507f1f77bcf86cd799439012"
+        - name: pid
+          in: path
+          required: true
+          description: ID del producto a agregar
+          schema:
+            type: string
+            example: "507f1f77bcf86cd799439011"
+      requestBody:
         required: true
-        description: ID del carrito que se solicita
-        schema:
-          type: string
-      - name: pid
-        in: path
-        required: true
-        description: ID del producto que se solicita
-        schema:
-          type: string
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                quantity:
+                  type: integer
+                  minimum: 1
+                  default: 1
+                  example: 2
       responses:
         '200':
-          description: El producto del carrito fue devuelto satisfactoriamente
-        '500':
-          description: Error interno del server
-        '404':
-          description: No se encontro el carrito o el producto
-  /api/session/carts/{cid}/products/{pid}:
-    delete:
-      summary: Borrar un producto particular del carrito
-      tags:
-        - Cart
-      parameters:
-      - name: cid
-        in: path
-        required: true
-        description: ID del carrito que se solicita
-        schema:
-          type: string
-      - name: pid
-        in: path
-        required: true
-        description: ID del producto que se solicita
-        schema:
-          type: string
-      responses:
-        '200':
-          description: El producto del carrito fue eliminado satisfactoriamente
-        '500':
-          description: Error interno del server
-        '404':
-          description: No se encontro el carrito o el producto
+          description: Producto agregado al carrito exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '400':
+          description: Cantidad inválida o producto no disponible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    
     put:
-      summary: Modificar un producto particular del carrito
       tags:
-        - Cart
+        - Carritos
+      summary: Actualizar cantidad de un producto
+      description: Actualiza la cantidad de un producto en el carrito
+      operationId: updateCartItem
+      security:
+        - bearerAuth: []
       parameters:
-      - name: cid
-        in: path
+        - name: cid
+          in: path
+          required: true
+          description: ID del carrito
+          schema:
+            type: string
+            example: "507f1f77bcf86cd799439012"
+        - name: pid
+          in: path
+          required: true
+          description: ID del producto a actualizar
+          schema:
+            type: string
+            example: "507f1f77bcf86cd799439011"
+      requestBody:
         required: true
-        description: ID del carrito que se solicita
-        schema:
-          type: string
-      - name: pid
-        in: path
-        required: true
-        description: ID del producto que se solicita
-        schema:
-          type: string
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - quantity
+              properties:
+                quantity:
+                  type: integer
+                  minimum: 1
+                  example: 3
       responses:
         '200':
-          description: El producto del carrito fue modificado satisfactoriamente
-        '500':
-          description: Error interno del server
+          description: Cantidad actualizada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '400':
+          description: Cantidad inválida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    
+    delete:
+      tags:
+        - Carritos
+      summary: Eliminar producto del carrito
+      description: Elimina un producto específico del carrito
+      operationId: removeProductFromCart
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: ID del carrito
+          schema:
+            type: string
+            example: "507f1f77bcf86cd799439012"
+        - name: pid
+          in: path
+          required: true
+          description: ID del producto a eliminar
+          schema:
+            type: string
+            example: "507f1f77bcf86cd799439011"
+      responses:
+        '200':
+          description: Producto eliminado del carrito exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
         '404':
-          description: No se encontro el carrito o el producto
-  /api/session/carts/{cid}/purchase:
+          description: Producto no encontrado en el carrito
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  
+  /session/carts/{cid}/purchase:
     post:
-      summary: Comprar productos del carrito
       tags:
-        - Cart
+        - Compras
+      summary: Realizar compra
+      description: Procesa la compra de los productos en el carrito
+      operationId: processPurchase
+      security:
+        - bearerAuth: []
       parameters:
-      - name: cid
-        in: path
+        - name: cid
+          in: path
+          required: true
+          description: ID del carrito a comprar
+          schema:
+            type: string
+            example: "507f1f77bcf86cd799439012"
+      requestBody:
         required: true
-        description: ID del carrito que se solicita
-        schema:
-          type: string
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PurchaseRequest'
       responses:
         '200':
-          description: La compra se ejecuto satisfactoriamente
-        '500':
-          description: Error interno del server
+          description: Compra realizada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseResponse'
+        '400':
+          description: Error en los datos de la compra
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: No se encontro el carrito
+          description: Carrito no encontrado o vacío
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'

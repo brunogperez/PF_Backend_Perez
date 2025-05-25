@@ -1,322 +1,488 @@
+openapi: 3.0.0
+info:
+  title: API de Productos
+  description: |
+    Esta documentación cubre los endpoints relacionados con la gestión de productos,
+    incluyendo la creación, consulta, actualización y eliminación de productos.
+  version: 1.0.0
+  contact:
+    name: Soporte
+    email: soporte@ecommerce.com
 
-paths: 
-  /api/session/products/:
-    get:
-      summary: Todos los Products
-      tags:
-        - Product
-      requestBody:
-        required: true
-        content: 
-          application/json:
-            schema:
-              type: object
-              properties:
-                title:
-                  type: string
-                  description: Título del producto
-                description:
-                  type: String
-                  description: Descripción del producto
-                code:
-                  type: String
-                  description: Codigo del producto
-                price:
-                  type: Number
-                  description: Precio del producto
-                stock:
-                  type: Number
-                  description:  Cantidad de stock
-                category:
-                  type: String
-                  description: Categoria del producto
-      responses:
-        '200':
-          description: Los productos se muestran correctamente
-          content:
-            application/json:
-              schema:
-                type: Object
-                properties:
-                  title:
-                    type: String
-                    description: Titulo del producto
-                  description:
-                    type: String
-                    description: Descripcion del producto
-                  code:
-                    type: String
-                    description: Codigo del producto
-                  price:
-                    type: Number
-                    description: Precio del producto
-                  status:
-                    type: Boolean
-                    description: Status
-                  stock:
-                    type: Number
-                    description:  Cantidad de stock
-                  category:
-                    type: String
-                    description: Categoria del producto
-                  thumbnails:
-                    type: String
-                    description: Imagen
-                  owner:
-                    type: String
-                    description: Owner
-        '500':
-          description: Error interno del Server
-          content: 
-            application/json:
-              schema:
-                type: object
-                properties:
-                  ok:
-                    type: false
-                  msg:
-                    type: Datos Incorrectos
-    post:
-      summary: Cargar un Product
-      tags:
-        - Product
-      requestBody:
-        required: true
-        content: 
-          application/json:
-            schema:
-              type: object
-              properties:
-                title:
-                  type: string
-                  description: Titulo del producto
-                description:
-                  type: String
-                  description: Descripcion del producto
-                code:
-                  type: String
-                  description: Codigo del producto
-                price:
-                  type: Number
-                  description: Precio del producto
-                stock:
-                  type: Number
-                  description:  Cantidad de stock
-                category:
-                  type: String
-                  description: Categoria del producto
-      responses:
-        '200':
-          description: Los productos se muestran correctamente
-          content:
-            application/json:
-              schema:
-                type: Object
-                properties:
-                  title:
-                    type: String
-                    description: Titulo del producto
-                  description:
-                    type: String
-                    description: Descripcion del producto
-                  code:
-                    type: String
-                    description: Codigo del producto
-                  price:
-                    type: Number
-                    description: Precio del producto
-                  status:
-                    type: Boolean
-                    description: Status
-                  stock:
-                    type: Number
-                    description:  Cantidad de stock
-                  category:
-                    type: String
-                    description: Categoria del producto
-                  thumbnails:
-                    type: String
-                    description: Imagen
-                  owner:
-                    type: String
-                    description: Owner
-        '500':
-          description: Error interno del Server
-          content: 
-            application/json:
-              schema:
-                type: object
-                properties:
-                  ok:
-                    type: false
-                  msg:
-                    type: Datos Incorrectos
-  /api/session/products/{pid}:
-    get:
-      summary: Un producto en particular
-      tags:
-        - Product
-      parameters:
-      - name: pid
-        in: path
-        required: true
-        description: ID del producto que se solicita
-        schema:
+servers:
+  - url: http://localhost:8080/api
+    description: Servidor de desarrollo
+  - url: https://api.ecommerce.com/api
+    description: Servidor de producción
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  
+  schemas:
+    Product:
+      type: object
+      properties:
+        _id:
           type: string
+          example: "507f1f77bcf86cd799439011"
+        title:
+          type: string
+          example: "Smartphone XYZ"
+        description:
+          type: string
+          example: "Último modelo con pantalla AMOLED de 6.5\""
+        code:
+          type: string
+          example: "P12345"
+        price:
+          type: number
+          format: float
+          minimum: 0
+          example: 599.99
+        status:
+          type: boolean
+          default: true
+          example: true
+        stock:
+          type: integer
+          minimum: 0
+          example: 100
+        category:
+          type: string
+          example: "Electrónicos"
+        thumbnails:
+          type: string
+          format: uri
+          example: "https://res.cloudinary.com/example/image/upload/v1234567890/phone.jpg"
+        owner:
+          type: string
+          example: "507f1f77bcf86cd799439012"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    
+    ProductCreateRequest:
+      type: object
+      required:
+        - title
+        - description
+        - code
+        - price
+        - stock
+        - category
+      properties:
+        title:
+          type: string
+          minLength: 3
+          maxLength: 100
+          example: "Smartphone XYZ"
+        description:
+          type: string
+          minLength: 10
+          example: "Último modelo con pantalla AMOLED de 6.5\""
+        code:
+          type: string
+          minLength: 3
+          maxLength: 20
+          example: "P12345"
+        price:
+          type: number
+          format: float
+          minimum: 0
+          example: 599.99
+        stock:
+          type: integer
+          minimum: 0
+          example: 100
+        category:
+          type: string
+          minLength: 2
+          example: "Electrónicos"
+        status:
+          type: boolean
+          default: true
+        thumbnails:
+          type: string
+          format: uri
+          example: "https://example.com/images/phone.jpg"
+    
+    ProductUpdateRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 3
+          maxLength: 100
+          example: "Smartphone XYZ Pro"
+        description:
+          type: string
+          minLength: 10
+          example: "Modelo mejorado con cámara de 108MP"
+        code:
+          type: string
+          minLength: 3
+          maxLength: 20
+          example: "P12346"
+        price:
+          type: number
+          format: float
+          minimum: 0
+          example: 699.99
+        stock:
+          type: integer
+          minimum: 0
+          example: 150
+        category:
+          type: string
+          minLength: 2
+          example: "Electrónicos"
+        status:
+          type: boolean
+          example: true
+        thumbnails:
+          type: string
+          format: uri
+          example: "https://example.com/images/phone-pro.jpg"
+    
+    ProductListResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "success"
+        payload:
+          type: array
+          items:
+            $ref: '#/components/schemas/Product'
+        totalPages:
+          type: integer
+          example: 5
+        prevPage:
+          type: integer
+          nullable: true
+          example: 1
+        nextPage:
+          type: integer
+          nullable: true
+          example: 3
+        page:
+          type: integer
+          example: 2
+        hasPrevPage:
+          type: boolean
+          example: true
+        hasNextPage:
+          type: boolean
+          example: true
+        prevLink:
+          type: string
+          nullable: true
+          example: "/api/products?page=1&limit=10"
+        nextLink:
+          type: string
+          nullable: true
+          example: "/api/products?page=3&limit=10"
+    
+    ErrorResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          example: false
+        msg:
+          type: string
+          example: "Error message describing the issue"
+
+paths:
+  /products:
+    get:
+      tags:
+        - Productos
+      summary: Obtener lista de productos
+      description: |
+        Retorna una lista paginada de productos. Los usuarios autenticados pueden ver todos los productos,
+        mientras que los usuarios no autenticados solo ven los productos con estado activo.
+      operationId: getProducts
+      parameters:
+        - name: limit
+          in: query
+          description: Número de productos por página
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 10
+        - name: page
+          in: query
+          description: Número de página
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: sort
+          in: query
+          description: Ordenar por precio (asc/desc)
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+        - name: query
+          in: query
+          description: Filtro de búsqueda en formato JSON stringificado
+          required: false
+          schema:
+            type: string
+            example: '{"category":"Electrónicos"}'
       responses:
         '200':
-          description: El producto fue devuelto satisfactoriamente
-        '500':
-          description: Error interno del server
+          description: Lista de productos obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductListResponse'
+        '400':
+          description: Parámetros de consulta inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    
+    post:
+      tags:
+        - Productos
+      summary: Crear un nuevo producto
+      description: |
+        Crea un nuevo producto. Requiere autenticación y permisos de administrador o premium.
+      operationId: createProduct
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                code:
+                  type: string
+                price:
+                  type: number
+                stock:
+                  type: integer
+                category:
+                  type: string
+                status:
+                  type: boolean
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: Producto creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '400':
+          description: Datos del producto inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: El código del producto ya existe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  
+  /products/{pid}:
+    get:
+      tags:
+        - Productos
+      summary: Obtener un producto por ID
+      description: Obtiene los detalles de un producto específico por su ID
+      operationId: getProductById
+      parameters:
+        - name: pid
+          in: path
+          required: true
+          description: ID del producto
+          schema:
+            type: string
+            example: "507f1f77bcf86cd799439011"
+      responses:
+        '200':
+          description: Producto obtenido exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
         '404':
-          description: No se encontro el producto
+          description: Producto no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    
     put:
-      summary: Modificar un producto en particular
       tags:
-        - Product
+        - Productos
+      summary: Actualizar un producto
+      description: |
+        Actualiza un producto existente. Solo el administrador o el propietario del producto pueden actualizarlo.
+      operationId: updateProduct
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: pid
+          in: path
+          required: true
+          description: ID del producto a actualizar
+          schema:
+            type: string
+            example: "507f1f77bcf86cd799439011"
       requestBody:
         required: true
-        content: 
-          application/json:
+        content:
+          multipart/form-data:
             schema:
               type: object
               properties:
                 title:
                   type: string
-                  description: Titulo del producto
                 description:
-                  type: String
-                  description: Descripcion del producto
+                  type: string
                 code:
-                  type: String
-                  description: Codigo del producto
+                  type: string
                 price:
-                  type: Number
-                  description: Precio del producto
+                  type: number
                 stock:
-                  type: Number
-                  description:  Cantidad de stock
+                  type: integer
                 category:
-                  type: String
-                  description: Categoria del producto
+                  type: string
+                status:
+                  type: boolean
+                file:
+                  type: string
+                  format: binary
       responses:
         '200':
-          description: El producto se modifico correctamente
+          description: Producto actualizado exitosamente
           content:
             application/json:
               schema:
-                type: Object
-                properties:
-                  title:
-                    type: String
-                    description: Titulo del producto
-                  description:
-                    type: String
-                    description: Descripcion del producto
-                  code:
-                    type: String
-                    description: Codigo del producto
-                  price:
-                    type: Number
-                    description: Precio del producto
-                  status:
-                    type: Boolean
-                    description: Status
-                  stock:
-                    type: Number
-                    description:  Cantidad de stock
-                  category:
-                    type: String
-                    description: Categoria del producto
-                  thumbnails:
-                    type: String
-                    description: Imagen
-                  owner:
-                    type: String
-                    description: Owner
-        '500':
-          description: Error interno del Server
-          content: 
+                $ref: '#/components/schemas/Product'
+        '400':
+          description: Datos del producto inválidos
+          content:
             application/json:
               schema:
-                type: object
-                properties:
-                  ok:
-                    type: false
-                  msg:
-                    type: Datos Incorrectos
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: No tienes permiso para actualizar este producto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Producto no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    
     delete:
-      summary: Borrar un producto en particular
       tags:
-        - Product
-      requestBody:
-        required: true
-        content: 
-          application/json:
-            schema:
-              type: object
-              properties:
-                title:
-                  type: string
-                  description: Titulo del producto
-                description:
-                  type: String
-                  description: Descripcion del producto
-                code:
-                  type: String
-                  description: Codigo del producto
-                price:
-                  type: Number
-                  description: Precio del producto
-                stock:
-                  type: Number
-                  description:  Cantidad de stock
-                category:
-                  type: String
-                  description: Categoria del producto
+        - Productos
+      summary: Eliminar un producto
+      description: |
+        Elimina un producto. Solo el administrador o el propietario del producto pueden eliminarlo.
+      operationId: deleteProduct
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: pid
+          in: path
+          required: true
+          description: ID del producto a eliminar
+          schema:
+            type: string
+            example: "507f1f77bcf86cd799439011"
       responses:
         '200':
-          description: El producto se elimino correctamente
+          description: Producto eliminado exitosamente
           content:
-            application/json:
-              schema:
-                type: Object
-                properties:
-                  title:
-                    type: String
-                    description: Titulo del producto
-                  description:
-                    type: String
-                    description: Descripcion del producto
-                  code:
-                    type: String
-                    description: Codigo del producto
-                  price:
-                    type: Number
-                    description: Precio del producto
-                  status:
-                    type: Boolean
-                    description: Status
-                  stock:
-                    type: Number
-                    description:  Cantidad de stock
-                  category:
-                    type: String
-                    description: Categoria del producto
-                  thumbnails:
-                    type: String
-                    description: Imagen
-                  owner:
-                    type: String
-                    description: Owner
-        '500':
-          description: Error interno del Server
-          content: 
             application/json:
               schema:
                 type: object
                 properties:
-                  ok:
-                    type: false
                   msg:
-                    type: Datos Incorrectos
+                    type: string
+                    example: "Producto eliminado"
+                  product:
+                    $ref: '#/components/schemas/Product'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: No tienes permiso para eliminar este producto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Producto no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  
+  /products/mockingproducts:
+    get:
+      tags:
+        - Productos
+      summary: Generar productos de prueba
+      description: |
+        Genera una lista de 100 productos de prueba para propósitos de desarrollo.
+        No requiere autenticación.
+      operationId: generateMockProducts
+      responses:
+        '200':
+          description: Productos de prueba generados exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  products:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Product'

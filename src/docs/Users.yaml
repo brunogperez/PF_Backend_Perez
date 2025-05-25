@@ -1,72 +1,265 @@
-paths: 
-  /api/session/login:
+openapi: 3.0.0
+info:
+  title: API de Usuarios
+  description: |
+    Esta documentación cubre los endpoints relacionados con la gestión de usuarios,
+    incluyendo autenticación, registro y recuperación de contraseña.
+  version: 1.0.0
+  contact:
+    name: Soporte
+    email: soporte@ecommerce.com
+
+servers:
+  - url: http://localhost:8080/api
+    description: Servidor de desarrollo
+  - url: https://api.ecommerce.com/api
+    description: Servidor de producción
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: 507f1f77bcf86cd799439011
+        first_name:
+          type: string
+          example: "Juan"
+        last_name:
+          type: string
+          example: "Pérez"
+        email:
+          type: string
+          format: email
+          example: "juan.perez@example.com"
+        role:
+          type: string
+          enum: ["user", "premium", "admin"]
+          example: "user"
+        status:
+          type: boolean
+          example: true
+        cart_id:
+          type: string
+          example: "507f1f77bcf86cd799439012"
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: "usuario@example.com"
+        password:
+          type: string
+          format: password
+          example: "contraseña123"
+
+    LoginResponse:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/User'
+        token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+    RegisterRequest:
+      type: object
+      required:
+        - first_name
+        - last_name
+        - email
+        - password
+      properties:
+        first_name:
+          type: string
+          example: "María"
+        last_name:
+          type: string
+          example: "González"
+        email:
+          type: string
+          format: email
+          example: "maria@example.com"
+        password:
+          type: string
+          format: password
+          minLength: 8
+          example: "contraseñaSegura123"
+
+    ErrorResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          example: false
+        msg:
+          type: string
+          example: "Error message describing the issue"
+
+paths:
+  /session/login:
     post:
-      summary: Iniciar sesión en la aplicación
       tags:
-        - Users
+        - Autenticación
+      summary: Iniciar sesión
+      description: Autentica un usuario y devuelve un token JWT
+      operationId: loginUser
       requestBody:
         required: true
-        content: 
+        content:
           application/json:
             schema:
-              type: object
-              properties:
-                email: 
-                  type: string
-                  description: Correo electrónico del usuario
-                password:
-                  type: string
-                  description: Contraseña del usuario
+              $ref: '#/components/schemas/LoginRequest'
       responses:
         '200':
-          description: Inicio de sesión correcto
+          description: Inicio de sesión exitoso
           content:
             application/json:
               schema:
-                user:
-                  type: object
-                  properties:
-                    _id:
-                      type: string
-                    first_name:
-                      type: string
-                    last_name:
-                      type: string
-                    email:
-                      type: string
-                    password:
-                      type: string
-                    role:
-                      type: string
-                    status:
-                      type: boolean
-                    cart_id:
-                      type: string
-                token:
-                  type: string
+                $ref: '#/components/schemas/LoginResponse'
         '400':
-          description: Datos invalidos
-          content: 
+          description: Datos de inicio de sesión inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /session/register:
+    post:
+      tags:
+        - Usuarios
+      summary: Registrar nuevo usuario
+      description: Crea una nueva cuenta de usuario
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Usuario registrado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Datos de registro inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: El correo electrónico ya está en uso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /session/change-password:
+    post:
+      tags:
+        - Autenticación
+      summary: Solicitar cambio de contraseña
+      description: Envía un correo electrónico con un enlace para restablecer la contraseña
+      operationId: requestPasswordReset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: "usuario@example.com"
+      responses:
+        '200':
+          description: Correo de recuperación enviado
+          content:
             application/json:
               schema:
                 type: object
                 properties:
                   ok:
-                    type: false
+                    type: boolean
+                    example: true
                   msg:
-                    type: Datos Incorrectos
-  /api/session/register:
+                    type: string
+                    example: "Se ha enviado un correo con las instrucciones"
+        '404':
+          description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /session/reset-password/{token}:
     post:
-      summary: Registrar un usuario
       tags:
-        - Users
-  /api/session/change-password:
-    post:
-      summary: Solicitar cambio de contraseña
-      tags:
-        - Users
-  /api/session/reset-password:
-    get:
-      summary: Cambiar contraseña
-      tags:
-        - Users
+        - Autenticación
+      summary: Restablecer contraseña
+      description: Restablece la contraseña usando un token de recuperación
+      operationId: resetPassword
+      parameters:
+        - name: token
+          in: path
+          required: true
+          description: Token de recuperación de contraseña
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - newPassword
+              properties:
+                newPassword:
+                  type: string
+                  format: password
+                  minLength: 8
+                  example: "nuevaContraseña123"
+      responses:
+        '200':
+          description: Contraseña actualizada correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  msg:
+                    type: string
+                    example: "Contraseña actualizada correctamente"
+        '400':
+          description: Token inválido o expirado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'

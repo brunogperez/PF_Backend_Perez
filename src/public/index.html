@@ -1,21 +1,521 @@
 <!DOCTYPE html>
-<html lang='en'>
+<html lang='es'>
 
 <head>
   <meta charset='UTF-8'>
   <meta name='viewport' content='width=device-width, initial-scale=1.0'>
   <link rel='stylesheet' href='/css/style.css'>
-  <title>Ecommerce CoderHouse</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <title>Documentación API - Ecommerce</title>
+  <style>
+    :root {
+      --primary-color: #2563eb;
+      --secondary-color: #1e40af;
+      --text-color: #1f2937;
+      --bg-color: #f9fafb;
+      --card-bg: #ffffff;
+      --border-color: #e5e7eb;
+      --success-color: #10b981;
+      --error-color: #ef4444;
+      --warning-color: #f59e0b;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      line-height: 1.6;
+      color: var(--text-color);
+      background-color: var(--bg-color);
+      padding: 0;
+      margin: 0;
+    }
+
+    header {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 1.5rem 2rem;
+      font-size: 1.5rem;
+      font-weight: 600;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .intro {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      border-left: 4px solid var(--primary-color);
+    }
+
+    h1 {
+      color: var(--primary-color);
+      margin-bottom: 1rem;
+    }
+
+    .subtitle {
+      color: #4b5563;
+      margin-bottom: 1.5rem;
+    }
+
+    .auth-required {
+      display: inline-block;
+      background-color: var(--warning-color);
+      color: white;
+      font-size: 0.75rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      margin-left: 0.5rem;
+      vertical-align: middle;
+    }
+
+    .admin-required {
+      background-color: var(--error-color);
+    }
+
+    .method {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 4px;
+      color: white;
+      font-weight: 600;
+      font-size: 0.8rem;
+      margin-right: 0.75rem;
+      text-transform: uppercase;
+    }
+
+    .get { background-color: #10b981; }
+    .post { background-color: #3b82f6; }
+    .put { background-color: #f59e0b; }
+    .delete { background-color: #ef4444; }
+
+    details {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    details[open] {
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    summary {
+      padding: 1.25rem 2rem;
+      font-size: 1.25rem;
+      font-weight: 600;
+      cursor: pointer;
+      outline: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background-color 0.2s;
+    }
+
+    summary:hover {
+      background-color: #f3f4f6;
+    }
+
+    summary::after {
+      content: '\f078';
+      font-family: 'Font Awesome 6 Free';
+      font-weight: 900;
+      transition: transform 0.2s;
+    }
+
+    details[open] > summary::after {
+      transform: rotate(180deg);
+    }
+
+    .endpoint-details {
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .endpoint-details:last-child {
+      border-bottom: none;
+    }
+
+    .endpoint-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .endpoint-path {
+      font-family: 'Courier New', monospace;
+      background-color: #f3f4f6;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      margin-left: 1rem;
+    }
+
+    .params-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+      font-size: 0.9rem;
+    }
+
+    .params-table th, .params-table td {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .params-table th {
+      background-color: #f9fafb;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+    }
+
+    .params-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .required {
+      color: var(--error-color);
+      font-weight: 600;
+      font-size: 0.8rem;
+      margin-left: 0.25rem;
+    }
+
+    .example {
+      background-color: #1e293b;
+      color: #e2e8f0;
+      padding: 1rem;
+      border-radius: 6px;
+      margin: 1rem 0;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      overflow-x: auto;
+    }
+
+    .example pre {
+      margin: 0;
+    }
+
+    .example .method {
+      color: #60a5fa;
+      background: none;
+      padding: 0;
+      margin: 0;
+      display: inline;
+    }
+
+    .example .url {
+      color: #f0f9af;
+    }
+
+    .example .comment {
+      color: #94a3b8;
+      font-style: italic;
+    }
+
+    .example .key {
+      color: #7dd3fc;
+    }
+
+    .example .string {
+      color: #86efac;
+    }
+
+    .example .number {
+      color: #fca5a5;
+    }
+
+    .example .boolean {
+      color: #f472b6;
+    }
+
+    .response {
+      margin-top: 1.5rem;
+    }
+
+    .response h4 {
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+      color: var(--text-color);
+    }
+
+    .tabs {
+      display: flex;
+      margin: 1rem 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .tab {
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .tab.active {
+      border-bottom-color: var(--primary-color);
+      color: var(--primary-color);
+      font-weight: 600;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .status-code {
+      display: inline-block;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-right: 0.5rem;
+    }
+
+    .status-2xx { background-color: #dcfce7; color: #166534; }
+    .status-4xx { background-color: #fee2e2; color: #991b1b; }
+    .status-5xx { background-color: #ffedd5; color: #9a3412; }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 1rem;
+      }
+
+      .endpoint-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .endpoint-path {
+        margin: 0.5rem 0 0 0;
+      }
+
+      .params-table {
+        display: block;
+        overflow-x: auto;
+      }
+    }
+  </style>
 </head>
 
 <body>
-
   <header>
-    Docs API Ecommerce Perez Bruno
+    <div class="container">
+      <h1>Documentación de la API</h1>
+      <p class="subtitle">API RESTful para el sistema de Ecommerce</p>
+    </div>
   </header>
 
-  <details>
-    <summary>Autenticación</summary>
+  <div class="container">
+    <div class="intro">
+      <h2>Introducción</h2>
+      <p>Bienvenido a la documentación de la API de Ecommerce. Esta API proporciona acceso a los recursos necesarios para gestionar productos, carritos de compras, usuarios y autenticación.</p>
+      <p><strong>URL Base:</strong> <code>http://tu-dominio.com/api</code></p>
+      
+      <div style="margin-top: 1.5rem;">
+        <h3>Autenticación</h3>
+        <p>La mayoría de los endpoints requieren autenticación mediante JWT (JSON Web Token). Incluye el token en el encabezado de autorización:</p>
+        <div class="example">
+          <pre>Authorization: Bearer &lt;token&gt;</pre>
+        </div>
+      </div>
+      
+      <div style="margin-top: 1.5rem;">
+        <h3>Códigos de estado comunes</h3>
+        <ul style="list-style: none; padding: 0;">
+          <li><span class="status-code status-2xx">200 OK</span> - La solicitud se completó exitosamente</li>
+          <li><span class="status-code status-2xx">201 Creado</span> - Recurso creado exitosamente</li>
+          <li><span class="status-code status-4xx">400 Error</span> - Solicitud incorrecta (datos inválidos)</li>
+          <li><span class="status-code status-4xx">401 No autorizado</span> - Se requiere autenticación</li>
+          <li><span class="status-code status-4xx">403 Prohibido</span> - No tienes permiso para realizar esta acción</li>
+          <li><span class="status-code status-4xx">404 No encontrado</span> - El recurso solicitado no existe</li>
+          <li><span class="status-code status-5xx">500 Error del servidor</span> - Error interno del servidor</li>
+        </ul>
+      </div>
+    </div>
+
+  <details open>
+    <summary><i class="fas fa-user-shield" style="margin-right: 10px;"></i> Autenticación</summary>
+    
+    <div class='endpoint-details'>
+      <div class="endpoint-header">
+        <span class="method post">POST</span>
+        <h2>/api/session/register</h2>
+      </div>
+      <p>Registra un nuevo usuario en el sistema.</p>
+      
+      <h4>Parámetros del cuerpo (JSON)</h4>
+      <table class="params-table">
+        <thead>
+          <tr>
+            <th>Parámetro</th>
+            <th>Tipo</th>
+            <th>Requerido</th>
+            <th>Descripción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>first_name</td>
+            <td>String</td>
+            <td><span class="required">Sí</span></td>
+            <td>Nombre del usuario</td>
+          </tr>
+          <tr>
+            <td>last_name</td>
+            <td>String</td>
+            <td><span class="required">Sí</span></td>
+            <td>Apellido del usuario</td>
+          </tr>
+          <tr>
+            <td>email</td>
+            <td>String</td>
+            <td><span class="required">Sí</span></td>
+            <td>Email del usuario (debe ser único)</td>
+          </tr>
+          <tr>
+            <td>age</td>
+            <td>Number</td>
+            <td>No</td>
+            <td>Edad del usuario</td>
+          </tr>
+          <tr>
+            <td>password</td>
+            <td>String</td>
+            <td><span class="required">Sí</span></td>
+            <td>Contraseña (mínimo 6 caracteres)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="tabs">
+        <div class="tab active" data-tab="register-request">Solicitud</div>
+        <div class="tab" data-tab="register-response">Respuesta</div>
+      </div>
+
+      <div id="register-request" class="tab-content active">
+        <div class="example">
+          <pre><span class="method">POST</span> <span class="url">/api/session/register</span>
+<span class="comment">// Headers</span>
+Content-Type: application/json
+
+{
+  <span class="key">"first_name"</span>: <span class="string">"Juan"</span>,
+  <span class="key">"last_name"</span>: <span class="string">"Pérez"</span>,
+  <span class="key">"email"</span>: <span class="string">"juan@example.com"</span>,
+  <span class="key">"age"</span>: <span class="number">30</span>,
+  <span class="key">"password"</span>: <span class="string">"miContraseña123"</span>
+}</pre>
+        </div>
+      </div>
+
+      <div id="register-response" class="tab-content">
+        <div class="example">
+          <pre><span class="comment">// 201 Created</span>
+{
+  <span class="key">"status"</span>: <span class="string">"success"</span>,
+  <span class="key">"message"</span>: <span class="string">"Usuario registrado exitosamente"</span>,
+  <span class="key">"data"</span>: {
+    <span class="key">"user"</span>: {
+      <span class="key">"first_name"</span>: <span class="string">"Juan"</span>,
+      <span class="key">"last_name"</span>: <span class="string">"Pérez"</span>,
+      <span class="key">"email"</span>: <span class="string">"juan@example.com"</span>,
+      <span class="key">"age"</span>: <span class="number">30</span>,
+      <span class="key">"role"</span>: <span class="string">"user"</span>
+    }
+  }
+}</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class='endpoint-details'>
+      <div class="endpoint-header">
+        <span class="method post">POST</span>
+        <h2>/api/session/login</h2>
+      </div>
+      <p>Inicia sesión de usuario y devuelve un token JWT.</p>
+      
+      <h4>Parámetros del cuerpo (JSON)</h4>
+      <table class="params-table">
+        <thead>
+          <tr>
+            <th>Parámetro</th>
+            <th>Tipo</th>
+            <th>Requerido</th>
+            <th>Descripción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>email</td>
+            <td>String</td>
+            <td><span class="required">Sí</span></td>
+            <td>Email del usuario</td>
+          </tr>
+          <tr>
+            <td>password</td>
+            <td>String</td>
+            <td><span class="required">Sí</span></td>
+            <td>Contraseña del usuario</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="tabs">
+        <div class="tab active" data-tab="login-request">Solicitud</div>
+        <div class="tab" data-tab="login-response">Respuesta</div>
+      </div>
+
+      <div id="login-request" class="tab-content active">
+        <div class="example">
+          <pre><span class="method">POST</span> <span class="url">/api/session/login</span>
+<span class="comment">// Headers</span>
+Content-Type: application/json
+
+{
+  <span class="key">"email"</span>: <span class="string">"juan@example.com"</span>,
+  <span class="key">"password"</span>: <span class="string">"miContraseña123"</span>
+}</pre>
+        </div>
+      </div>
+
+      <div id="login-response" class="tab-content">
+        <div class="example">
+          <pre><span class="comment">// 200 OK</span>
+{
+  <span class="key">"status"</span>: <span class="string">"success"</span>,
+  <span class="key">"token"</span>: <span class="string">"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."</span>,
+  <span class="key">"user"</span>: {
+    <span class="key">"first_name"</span>: <span class="string">"Juan"</span>,
+    <span class="key">"last_name"</span>: <span class="string">"Pérez"</span>,
+    <span class="key">"email"</span>: <span class="string">"juan@example.com"</span>,
+    <span class="key">"role"</span>: <span class="string">"user"</span>,
+    <span class="key">"cart"</span>: <span class="string">"cart_1234567890"</span>
+  }
+}</pre>
+        </div>
+      </div>
+    </div>
     <div class='endpoint-details'>
       <h2>/api/session/login (POST)</h2>
       <p>Endpoint para iniciar sesión de usuario.</p>
@@ -83,7 +583,249 @@
   </details>
 
   <details>
-    <summary>Productos</summary>
+    <summary><i class="fas fa-box" style="margin-right: 10px;"></i> Productos</summary>
+    
+    <div class='endpoint-details'>
+      <div class="endpoint-header">
+        <span class="method get">GET</span>
+        <h2>/api/products</h2>
+      </div>
+      <p>Obtiene un listado paginado de productos.</p>
+      
+      <h4>Parámetros de consulta</h4>
+      <table class="params-table">
+        <thead>
+          <tr>
+            <th>Parámetro</th>
+            <th>Tipo</th>
+            <th>Requerido</th>
+            <th>Descripción</th>
+            <th>Valor por defecto</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>limit</td>
+            <td>Number</td>
+            <td>No</td>
+            <td>Número de productos por página</td>
+            <td>10</td>
+          </tr>
+          <tr>
+            <td>page</td>
+            <td>Number</td>
+            <td>No</td>
+            <td>Número de página</td>
+            <td>1</td>
+          </tr>
+          <tr>
+            <td>sort</td>
+            <td>String</td>
+            <td>No</td>
+            <td>Ordenamiento: 'asc' o 'desc'</td>
+            <td>Ninguno</td>
+          </tr>
+          <tr>
+            <td>query</td>
+            <td>String</td>
+            <td>No</td>
+            <td>Filtro de búsqueda (por título o descripción)</td>
+            <td>Ninguno</td>
+          </tr>
+          <tr>
+            <td>category</td>
+            <td>String</td>
+            <td>No</td>
+            <td>Filtrar por categoría</td>
+            <td>Ninguno</td>
+          </tr>
+          <tr>
+            <td>status</td>
+            <td>Boolean</td>
+            <td>No</td>
+            <td>Filtrar por estado (true/false)</td>
+            <td>Ninguno</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="tabs">
+        <div class="tab active" data-tab="products-request">Solicitud</div>
+        <div class="tab" data-tab="products-response">Respuesta</div>
+      </div>
+
+      <div id="products-request" class="tab-content active">
+        <div class="example">
+          <pre><span class="method">GET</span> <span class="url">/api/products?limit=5&page=1&sort=desc&category=electronics</span>
+<span class="comment">// Headers</span>
+Authorization: Bearer &lt;token&gt;</pre>
+        </div>
+      </div>
+
+      <div id="products-response" class="tab-content">
+        <div class="example">
+          <pre><span class="comment">// 200 OK</span>
+{
+  <span class="key">"status"</span>: <span class="string">"success"</span>,
+  <span class="key">"payload"</span>: [
+    {
+      <span class="key">"_id"</span>: <span class="string">"60d21b4667d0d8992e610c85"</span>,
+      <span class="key">"title"</span>: <span class="string">"Laptop HP"</span>,
+      <span class="key">"description"</span>: <span class="string">"Laptop HP 15-dw1000la"</span>,
+      <span class="key">"code"</span>: <span class="string">"LAP123"</span>,
+      <span class="key">"price"</span>: <span class="number">1299.99</span>,
+      <span class="key">"status"</span>: <span class="boolean">true</span>,
+      <span class="key">"stock"</span>: <span class="number">25</span>,
+      <span class="key">"category"</span>: <span class="string">"electronics"</span>,
+      <span class="key">"thumbnails"</span>: [<span class="string">"image1.jpg"</span>, <span class="string">"image2.jpg"</span>],
+      <span class="key">"owner"</span>: <span class="string">"admin@example.com"</span>
+    },
+    <span class="comment">// ... más productos</span>
+  ],
+  <span class="key">"totalPages"</span>: <span class="number">3</span>,
+  <span class="key">"prevPage"</span>: <span class="boolean">null</span>,
+  <span class="key">"nextPage"</span>: <span class="number">2</span>,
+  <span class="key">"page"</span>: <span class="number">1</span>,
+  <span class="key">"hasPrevPage"</span>: <span class="boolean">false</span>,
+  <span class="key">"hasNextPage"</span>: <span class="boolean">true</span>,
+  <span class="key">"prevLink"</span>: <span class="boolean">null</span>,
+  <span class="key">"nextLink"</span>: <span class="string">"/api/products?page=2"</span>
+}</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class='endpoint-details'>
+      <div class="endpoint-header">
+        <span class="method post">POST</span>
+        <h2>/api/products</h2>
+        <span class="auth-required">Autenticación requerida</span>
+      </div>
+      <p>Crea un nuevo producto. Requiere autenticación y rol de administrador o premium.</p>
+      
+      <h4>Parámetros del cuerpo (FormData)</h4>
+      <table class="params-table">
+        <thead>
+          <tr>
+            <th>Parámetro</th>
+            <th>Tipo</th>
+            <th>Requerido</th>
+            <th>Descripción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>title</td>
+            <td>String</td>
+            <td><span class="required">Sí</span></td>
+            <td>Nombre del producto</td>
+          </tr>
+          <tr>
+            <td>description</td>
+            <td>String</td>
+            <td><span class="required">Sí</span></td>
+            <td>Descripción detallada</td>
+          </tr>
+          <tr>
+            <td>code</td>
+            <td>String</td>
+            <td><span class="required">Sí</span></td>
+            <td>Código único del producto</td>
+          </tr>
+          <tr>
+            <td>price</td>
+            <td>Number</td>
+            <td><span class="required">Sí</span></td>
+            <td>Precio del producto</td>
+          </tr>
+          <tr>
+            <td>stock</td>
+            <td>Number</td>
+            <td><span class="required">Sí</span></td>
+            <td>Cantidad en stock</td>
+          </tr>
+          <tr>
+            <td>category</td>
+            <td>String</td>
+            <td><span class="required">Sí</span></td>
+            <td>Categoría del producto</td>
+          </tr>
+          <tr>
+            <td>thumbnails</td>
+            <td>File[]</td>
+            <td>No</td>
+            <td>Imágenes del producto (máx. 3)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="tabs">
+        <div class="tab active" data-tab="create-request">Solicitud</div>
+        <div class="tab" data-tab="create-response">Respuesta</div>
+      </div>
+
+      <div id="create-request" class="tab-content active">
+        <div class="example">
+          <pre><span class="method">POST</span> <span class="url">/api/products</span>
+<span class="comment">// Headers</span>
+Authorization: Bearer &lt;token&gt;
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="title"
+
+Nuevo Producto
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="description"
+
+Descripción del nuevo producto
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="code"
+
+CODE123
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="price"
+
+99.99
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="stock"
+
+50
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="category"
+
+electronics
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="thumbnails"; filename="product.jpg"
+Content-Type: image/jpeg
+
+(binary data)
+------WebKitFormBoundary7MA4YWxkTrZu0gW--</pre>
+        </div>
+      </div>
+
+      <div id="create-response" class="tab-content">
+        <div class="example">
+          <pre><span class="comment">// 201 Created</span>
+{
+  <span class="key">"status"</span>: <span class="string">"success"</span>,
+  <span class="key">"message"</span>: <span class="string">"Producto creado exitosamente"</span>,
+  <span class="key">"data"</span>: {
+    <span class="key">"_id"</span>: <span class="string">"60d21b4667d0d8992e610c86"</span>,
+    <span class="key">"title"</span>: <span class="string">"Nuevo Producto"</span>,
+    <span class="key">"description"</span>: <span class="string">"Descripción del nuevo producto"</span>,
+    <span class="key">"code"</span>: <span class="string">"CODE123"</span>,
+    <span class="key">"price"</span>: <span class="number">99.99</span>,
+    <span class="key">"status"</span>: <span class="boolean">true</span>,
+    <span class="key">"stock"</span>: <span class="number">50</span>,
+    <span class="key">"category"</span>: <span class="string">"electronics"</span>,
+    <span class="key">"thumbnails"</span>: [<span class="string">"product-123.jpg"</span>],
+    <span class="key">"owner"</span>: <span class="string">"usuario@example.com"</span>
+  }
+}</pre>
+        </div>
+      </div>
+    </div>
     <div class='endpoint-details'>
       <h2>/api/products (GET)</h2>
       <p>Endpoint para obtener productos paginados.</p>
@@ -150,7 +892,211 @@
   </details>
 
   <details>
-    <summary>Carrito</summary>
+    <summary><i class="fas fa-shopping-cart" style="margin-right: 10px;"></i> Carrito de Compras</summary>
+    
+    <div class='endpoint-details'>
+      <div class="endpoint-header">
+        <span class="method post">POST</span>
+        <h2>/api/carts</h2>
+        <span class="auth-required">Autenticación requerida</span>
+      </div>
+      <p>Crea un nuevo carrito de compras.</p>
+      
+      <div class="tabs">
+        <div class="tab active" data-tab="create-cart-request">Solicitud</div>
+        <div class="tab" data-tab="create-cart-response">Respuesta</div>
+      </div>
+
+      <div id="create-cart-request" class="tab-content active">
+        <div class="example">
+          <pre><span class="method">POST</span> <span class="url">/api/carts</span>
+<span class="comment">// Headers</span>
+Authorization: Bearer &lt;token&gt;</pre>
+        </div>
+      </div>
+
+      <div id="create-cart-response" class="tab-content">
+        <div class="example">
+          <pre><span class="comment">// 201 Created</span>
+{
+  <span class="key">"status"</span>: <span class="string">"success"</span>,
+  <span class="key">"message"</span>: <span class="string">"Carrito creado exitosamente"</span>,
+  <span class="key">"data"</span>: {
+    <span class="key">"_id"</span>: <span class="string">"60d21b4667d0d8992e610c90"</span>,
+    <span class="key">"products"</span>: [],
+    <span class="key">"user"</span>: <span class="string">"60d21b4667d0d8992e610c85"</span>,
+    <span class="key">"createdAt"</span>: <span class="string">"2023-06-01T12:00:00.000Z"</span>,
+    <span class="key">"updatedAt"</span>: <span class="string">"2023-06-01T12:00:00.000Z"</span>
+  }
+}</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class='endpoint-details'>
+      <div class="endpoint-header">
+        <span class="method get">GET</span>
+        <h2>/api/carts/:cid</h2>
+        <span class="auth-required">Autenticación requerida</span>
+      </div>
+      <p>Obtiene los productos de un carrito específico.</p>
+      
+      <h4>Parámetros de ruta</h4>
+      <table class="params-table">
+        <thead>
+          <tr>
+            <th>Parámetro</th>
+            <th>Tipo</th>
+            <th>Requerido</th>
+            <th>Descripción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>cid</td>
+            <td>String</td>
+            <td><span class="required">Sí</span></td>
+            <td>ID del carrito</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="tabs">
+        <div class="tab active" data-tab="get-cart-request">Solicitud</div>
+        <div class="tab" data-tab="get-cart-response">Respuesta</div>
+      </div>
+
+      <div id="get-cart-request" class="tab-content active">
+        <div class="example">
+          <pre><span class="method">GET</span> <span class="url">/api/carts/60d21b4667d0d8992e610c90</span>
+<span class="comment">// Headers</span>
+Authorization: Bearer &lt;token&gt;</pre>
+        </div>
+      </div>
+
+      <div id="get-cart-response" class="tab-content">
+        <div class="example">
+          <pre><span class="comment">// 200 OK</span>
+{
+  <span class="key">"status"</span>: <span class="string">"success"</span>,
+  <span class="key">"data"</span>: {
+    <span class="key">"_id"</span>: <span class="string">"60d21b4667d0d8992e610c90"</span>,
+    <span class="key">"products"</span>: [
+      {
+        <span class="key">"product"</span>: {
+          <span class="key">"_id"</span>: <span class="string">"60d21b4667d0d8992e610c85"</span>,
+          <span class="key">"title"</span>: <span class="string">"Laptop HP"</span>,
+          <span class="key">"price"</span>: <span class="number">1299.99</span>,
+          <span class="key">"thumbnails"</span>: [<span class="string">"image1.jpg"</span>]
+        },
+        <span class="key">"quantity"</span>: <span class="number">2</span>
+      }
+    ],
+    <span class="key">"user"</span>: <span class="string">"60d21b4667d0d8992e610c85"</span>,
+    <span class="key">"total"</span>: <span class="number">2599.98</span>,
+    <span class="key">"createdAt"</span>: <span class="string">"2023-06-01T12:00:00.000Z"</span>,
+    <span class="key">"updatedAt"</span>: <span class="string">"2023-06-01T12:30:00.000Z"</span>
+  }
+}</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class='endpoint-details'>
+      <div class="endpoint-header">
+        <span class="method post">POST</span>
+        <h2>/api/carts/:cid/product/:pid</h2>
+        <span class="auth-required">Autenticación requerida</span>
+      </div>
+      <p>Agrega un producto al carrito o incrementa su cantidad si ya existe.</p>
+      
+      <h4>Parámetros de ruta</h4>
+      <table class="params-table">
+        <thead>
+          <tr>
+            <th>Parámetro</th>
+            <th>Tipo</th>
+            <th>Requerido</th>
+            <th>Descripción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>cid</td>
+            <td>String</td>
+            <td><span class="required">Sí</span></td>
+            <td>ID del carrito</td>
+          </tr>
+          <tr>
+            <td>pid</td>
+            <td>String</td>
+            <td><span class="required">Sí</span></td>
+            <td>ID del producto a agregar</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Parámetros del cuerpo (JSON)</h4>
+      <table class="params-table">
+        <thead>
+          <tr>
+            <th>Parámetro</th>
+            <th>Tipo</th>
+            <th>Requerido</th>
+            <th>Descripción</th>
+            <th>Valor por defecto</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>quantity</td>
+            <td>Number</td>
+            <td>No</td>
+            <td>Cantidad a agregar</td>
+            <td>1</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="tabs">
+        <div class="tab active" data-tab="add-product-request">Solicitud</div>
+        <div class="tab" data-tab="add-product-response">Respuesta</div>
+      </div>
+
+      <div id="add-product-request" class="tab-content active">
+        <div class="example">
+          <pre><span class="method">POST</span> <span class="url">/api/carts/60d21b4667d0d8992e610c90/product/60d21b4667d0d8992e610c85</span>
+<span class="comment">// Headers</span>
+Authorization: Bearer &lt;token&gt;
+Content-Type: application/json
+
+{
+  <span class="key">"quantity"</span>: <span class="number">2</span>
+}</pre>
+        </div>
+      </div>
+
+      <div id="add-product-response" class="tab-content">
+        <div class="example">
+          <pre><span class="comment">// 200 OK</span>
+{
+  <span class="key">"status"</span>: <span class="string">"success"</span>,
+  <span class="key">"message"</span>: <span class="string">"Producto agregado al carrito"</span>,
+  <span class="key">"data"</span>: {
+    <span class="key">"_id"</span>: <span class="string">"60d21b4667d0d8992e610c90"</span>,
+    <span class="key">"products"</span>: [
+      {
+        <span class="key">"product"</span>: <span class="string">"60d21b4667d0d8992e610c85"</span>,
+        <span class="key">"quantity"</span>: <span class="number">2</span>
+      }
+    ],
+    <span class="key">"user"</span>: <span class="string">"60d21b4667d0d8992e610c85"</span>,
+    <span class="key">"updatedAt"</span>: <span class="string">"2023-06-01T13:00:00.000Z"</span>
+  }
+}</pre>
+        </div>
+      </div>
+    </div>
     <div class='endpoint-details'>
       <h2>/api/carts/:cid (GET)</h2>
       <p>Endpoint para obtener un carrito.</p>
@@ -247,6 +1193,56 @@
     </div>
   </details>
   </main>
-</body>
+  </div>
 
+  <footer style="background-color: #1f2937; color: #f3f4f6; padding: 2rem 0; margin-top: 3rem;">
+    <div class="container" style="text-align: center;">
+      <p>© 2023 Ecommerce API - Desarrollado por Bruno Perez</p>
+      <p style="margin-top: 0.5rem; font-size: 0.9rem; color: #9ca3af;">Versión 1.0.0</p>
+    </div>
+  </footer>
+
+  <script>
+    // Función para manejar las pestañas de ejemplos
+    document.addEventListener('DOMContentLoaded', function() {
+      // Activar la primera pestaña de cada grupo
+      document.querySelectorAll('.tabs').forEach(tabs => {
+        const firstTab = tabs.querySelector('.tab');
+        if (firstTab) {
+          firstTab.classList.add('active');
+          const tabContentId = firstTab.getAttribute('data-tab');
+          if (tabContentId) {
+            const tabContent = document.getElementById(tabContentId);
+            if (tabContent) tabContent.classList.add('active');
+          }
+        }
+      });
+
+      // Manejar clics en las pestañas
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+          const tabGroup = this.closest('.tabs');
+          const tabContentId = this.getAttribute('data-tab');
+          
+          // Desactivar todas las pestañas del grupo
+          tabGroup.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+          
+          // Activar la pestaña clickeada
+          this.classList.add('active');
+          
+          // Ocultar todos los contenidos del grupo
+          tabGroup.parentElement.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.remove('active');
+          });
+          
+          // Mostrar el contenido correspondiente
+          if (tabContentId) {
+            const tabContent = document.getElementById(tabContentId);
+            if (tabContent) tabContent.classList.add('active');
+          }
+        });
+      });
+    });
+  </script>
+</body>
 </html>
