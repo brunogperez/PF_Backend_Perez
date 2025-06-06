@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import { validationResult, check } from 'express-validator';
 import { cartsService, usersService } from '../services/index.js';
 import { generateToken, generateRefreshToken } from '../utils/jsonWebToken.js';
-import { createHash, isValidPassword } from '../utils/bcryptPassword.js';
+import { createHash, isValidPassword, isStrongPassword } from '../utils/bcryptPassword.js';
 import { logger } from '../utils/logger.js';
 import { sendEmail } from '../utils/sendEmail.js';
 import { JWT_PRIVATE_KEY, URL_RESET_PASS, NODE_ENV } from '../config/config.js';

@@ -24,8 +24,7 @@ export default class UsersRepository {
   deleteUsers = async (filter) => await this.dao.deleteUsers(filter)
   
   updateUser = async (id, updateData) => {
-    // This will update any fields provided in updateData
-    // The DAO method now accepts either an ID or an object with _id
+
     const result = await this.dao.updateUser(id, updateData);
     return result;
   }

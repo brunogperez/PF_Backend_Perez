@@ -13,7 +13,7 @@ export default class Users {
   createUser = async (user) => userModel.create(user)
 
   updateUser = async (user, updateData) => {
-    // If user is an object with _id, use that, otherwise assume user is the _id
+    
     const userId = user._id || user;
     return userModel.updateOne({ _id: userId }, { $set: updateData });
   }
