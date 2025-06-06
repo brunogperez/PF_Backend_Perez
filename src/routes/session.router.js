@@ -3,6 +3,8 @@ import { check } from 'express-validator';
 import {
   changePassword,
   deleteUser,
+  getUserById,
+  switchUserRole,
   getUsers,
   resetPassword,
   revalidateToken,
@@ -66,5 +68,22 @@ router.delete('/inactive-users', [
   validarJWT,
   isAdmin
 ], deleteUser);
+
+// Obtener un usuario por ID
+router.get('/user/:id', [
+  validarJWT,
+  isAdmin,
+  check('id', 'No es un ID válido').isMongoId(),
+  validateFields
+], getUserById);
+
+// Ruta para cambiar el rol de un usuario
+router.put('/switchRole/:id', [
+  validarJWT,
+  isAdmin,
+  check('role', 'El rol es obligatorio').not().isEmpty(),
+  check('role', 'Rol no válido').isIn(['user', 'premium', 'admin']),
+  validateFields
+], switchUserRole);
 
 export default router;

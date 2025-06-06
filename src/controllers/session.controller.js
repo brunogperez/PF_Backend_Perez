@@ -480,3 +480,78 @@ export const deleteInactiveUsers = async (req, res, next) => {
 		next(error);
 	}
 };
+
+export const getUserById = async (req, res, next) => {
+	try {
+		const { id } = req.params;
+
+		// Buscar el usuario por ID
+		const user = await usersService.getUserById(id);
+		if (!user) {
+			return res.status(404).json({
+				ok: false,
+				msg: 'Usuario no encontrado'
+			});
+		}
+
+		// Devolver los datos del usuario (sin información sensible)
+		const { _id, first_name, last_name, email, role, last_connection } = user;
+		
+		return res.json({
+			ok: true,
+			user: {
+				id: _id,
+				first_name,
+				last_name,
+				email,
+				role,
+				last_connection
+			}
+		});
+
+	} catch (error) {
+		logger.error(`Error en getUserById: ${error.message}`);
+		next(error);
+	}
+};
+
+export const switchUserRole = async (req, res, next) => {
+	try {
+		const { id } = req.params;
+		const { role } = req.body;
+
+		// Verificar si el usuario existe
+		const user = await usersService.getUserById(id);
+		if (!user) {
+			return res.status(404).json({
+				ok: false,
+				msg: 'Usuario no encontrado'
+			});
+		}
+
+		// Verificar si el rol solicitado es válido
+		if (role && !['user', 'premium', 'admin'].includes(role)) {
+			return res.status(400).json({
+				ok: false,
+				msg: 'Rol no válido. Los roles permitidos son: user, premium, admin'
+			});
+		}
+
+		// Cambiar el rol del usuario
+		const updatedUser = await usersService.switchRole(id, user.role, role);
+
+		return res.json({
+			ok: true,
+			msg: 'Rol de usuario actualizado correctamente',
+			user: {
+				id: updatedUser._id,
+				email: updatedUser.email,
+				role: updatedUser.role
+			}
+		});
+
+	} catch (error) {
+		logger.error(`Error en switchUserRole: ${error.message}`);
+		next(error);
+	}
+};

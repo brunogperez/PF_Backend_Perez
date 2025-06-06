@@ -13,9 +13,12 @@ export default class Users {
   createUser = async (user) => userModel.create(user)
 
   updateUser = async (user, updateData) => {
-    
     const userId = user._id || user;
-    return userModel.updateOne({ _id: userId }, { $set: updateData });
+    return userModel.findByIdAndUpdate(
+      userId, 
+      { $set: updateData },
+      { new: true, runValidators: true }
+    ).lean().exec();
   }
   
   deleteUser = async (id) => await userModel.findByIdAndDelete(id)

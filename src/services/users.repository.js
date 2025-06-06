@@ -13,10 +13,23 @@ export default class UsersRepository {
 
   changeUserPassword = async (user, password) =>  await this.dao.updateUser(user, password)
 
-  switchRole = async (user) => {
-    const role = user?.role != "admin" ? (user?.role == "user" ? "premium" : "user") : "admin"
-    const result = await this.dao.updateUser(user, role, "role")
-    return result
+ 
+  switchRole = async (userId, currentRole, newRole) => {
+    let roleToSet = newRole;
+    
+    // Si no se proporciona un nuevo rol, alternamos entre 'user' y 'premium'
+    if (!newRole) {
+      roleToSet = currentRole === 'user' ? 'premium' : 'user';
+    }
+    
+    // Validar que el rol sea uno de los permitidos
+    if (!['user', 'premium', 'admin'].includes(roleToSet)) {
+      throw new Error('Rol no válido. Los roles permitidos son: user, premium, admin');
+    }
+    
+    // Actualizar el rol del usuario
+    const updatedUser = await this.dao.updateUser(userId, { role: roleToSet });
+    return updatedUser;
   }
 
   deleteUser = async (id) => await this.dao.deleteUser(id)
