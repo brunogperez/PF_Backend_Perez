@@ -12,10 +12,10 @@ export default class Users {
 
   createUser = async (user) => userModel.create(user)
 
-  updateUser = async (user, value, field = 'password') => {
-    const updateObj = {}
-    updateObj[field] = value
-    return userModel.updateOne({ _id: user._id }, { $set: updateObj })
+  updateUser = async (user, updateData) => {
+    // If user is an object with _id, use that, otherwise assume user is the _id
+    const userId = user._id || user;
+    return userModel.updateOne({ _id: userId }, { $set: updateData });
   }
   
   deleteUser = async (id) => await userModel.findByIdAndDelete(id)

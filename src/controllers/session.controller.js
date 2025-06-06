@@ -48,11 +48,6 @@ export const resetPasswordValidations = [
 ];
 
 
-/**
- * @desc    Iniciar sesión
- * @route   POST /api/session/login
- * @access  Público
- */
 export const sessionLogin = async (req, res, next) => {
 	try {
 		const { email, password } = req.body;
@@ -116,11 +111,6 @@ export const sessionLogin = async (req, res, next) => {
 	}
 };
 
-/**
- * @desc    Registrar un nuevo usuario
- * @route   POST /api/session/register
- * @access  Público
- */
 export const sessionRegister = async (req, res, next) => {
 	try {
 		const { email, password } = req.body;
