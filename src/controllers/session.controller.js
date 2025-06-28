@@ -113,10 +113,36 @@ export const sessionLogin = async (req, res, next) => {
 
 export const sessionRegister = async (req, res, next) => {
 	try {
-		const { email, password } = req.body;
+		console.log('=== INICIO DEL REGISTRO ===');
+		console.log('Datos recibidos en el body:', JSON.stringify(req.body, null, 2));
+		
+		const { email, password, first_name, last_name} = req.body;
+		
+		// Validar campos requeridos
+		console.log('Validando campos requeridos...');
+		console.log('Email:', email);
+		console.log('Password:', password ? '***' : 'No proporcionada');
+		console.log('First Name:', first_name);
+		console.log('Last Name:', last_name);
+
+		// Validar campos requeridos
+		if (!email || !password || !first_name || !last_name) {
+			return res.status(400).json({
+				ok: false,
+				msg: 'Todos los campos son obligatorios',
+				missingFields: {
+					email: !email,
+					password: !password,
+					first_name: !first_name,
+					last_name: !last_name
+				}
+			});
+		}
 
 		// Verificar si el usuario ya existe
+		console.log('Buscando usuario con email:', email);
 		const userExists = await usersService.getUserByEmail(email);
+		console.log('Resultado de la búsqueda:', userExists ? 'Usuario encontrado' : 'Usuario no encontrado');
 		if (userExists) {
 			return res.status(400).json({
 				ok: false,
@@ -124,22 +150,53 @@ export const sessionRegister = async (req, res, next) => {
 			});
 		}
 
+		// Validar fortaleza de la contraseña
+		console.log('Validando fortaleza de la contraseña...');
+		const passwordIsStrong = isStrongPassword(password);
+		console.log('Contraseña válida?:', passwordIsStrong);
+		
+		if (!passwordIsStrong) {
+			return res.status(400).json({
+				ok: false,
+				msg: 'La contraseña debe contener al menos 8 caracteres, incluyendo mayúsculas, minúsculas, números y caracteres especiales',
+				passwordRequirements: {
+					minLength: password.length >= 8,
+					hasUpperCase: /[A-Z]/.test(password),
+					hasLowerCase: /[a-z]/.test(password),
+					hasNumbers: /[0-9]/.test(password),
+					hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+				}
+			});
+		}
 
 		// Crear carrito para el usuario
+		console.log('Creando carrito para el nuevo usuario...');
 		const cart = await cartsService.addCart();
+		console.log('Carrito creado:', cart ? `ID: ${cart._id}` : 'No se pudo crear el carrito');
 		if (!cart) {
 			throw new Error('No se pudo crear el carrito');
 		}
 
 		// Crear usuario
+		console.log('Preparando datos del usuario...');
+		const hashedPassword = createHash(password);
+		console.log('Contraseña hasheada:', hashedPassword ? '***' : 'Error al hashear');
+		
 		const userData = {
-			...req.body,
-			password: createHash(password),
+			first_name,
+			last_name,
+			email,
+			password: hashedPassword,
 			cart_id: cart._id
 		};
+		
+		console.log('Datos del usuario a crear:', {
+			...userData,
+			password: '***'
+		});
 
 		const user = await usersService.createUser(userData);
-		const { _id, first_name, last_name, role } = user;
+		const { _id, role } = user;
 
 		// Generar tokens
 		const token = generateToken({ _id, email, role });
@@ -165,14 +222,33 @@ export const sessionRegister = async (req, res, next) => {
 				first_name,
 				last_name,
 				email,
-				role
+				role,
+				cart_id: cart._id
 			},
 			token
 		});
 
 	} catch (error) {
-		logger.error(`Error en sessionRegister: ${error.message}`);
-		next(error);
+		console.error('=== ERROR EN EL REGISTRO ===');
+		console.error('Tipo de error:', error.name);
+		console.error('Mensaje:', error.message);
+		console.error('Stack:', error.stack);
+		
+		if (error.name === 'ValidationError') {
+			console.error('Errores de validación:', error.errors);
+			return res.status(400).json({
+				ok: false,
+				msg: 'Error de validación',
+				errors: Object.values(error.errors).map(err => err.message)
+			});
+		}
+		
+		logger.error(`Error en sessionRegister: ${error.message}`, { error });
+		return res.status(500).json({
+			ok: false,
+			msg: 'Error interno del servidor al registrar el usuario',
+			error: process.env.NODE_ENV === 'development' ? error.message : undefined
+		});
 	}
 };
 
@@ -421,31 +497,74 @@ export const getUsers = async (req, res, next) => {
 export const deleteUser = async (req, res, next) => {
 	try {
 		const { id } = req.params;
+		logger.info(`Intentando eliminar usuario con ID: ${id}`);
+
+		// Verificar si el usuario está autenticado
+		if (!req.user || !req.user._id) {
+			logger.warn('Intento de eliminación sin autenticación');
+			return res.status(401).json({
+				ok: false,
+				msg: 'No autorizado. Debes iniciar sesión primero.'
+			});
+		}
 
 		// Verificar que el usuario no se esté intentando eliminar a sí mismo
 		if (req.user._id.toString() === id) {
+			logger.warn('Intento de auto-eliminación detectado');
 			return res.status(400).json({
 				ok: false,
 				msg: 'No puedes eliminar tu propia cuenta'
 			});
 		}
 
-		const deletedUser = await usersService.deleteUser(id);
-
-		if (!deletedUser) {
+		// Verificar que el usuario a eliminar exista
+		const userToDelete = await usersService.getUserById(id);
+		if (!userToDelete) {
+			logger.warn(`Usuario con ID ${id} no encontrado`);
 			return res.status(404).json({
 				ok: false,
 				msg: 'Usuario no encontrado'
 			});
 		}
 
+		// Verificar permisos (solo admin puede eliminar usuarios)
+		if (req.user.role !== 'admin') {
+			logger.warn('Intento de eliminación sin permisos de administrador');
+			return res.status(403).json({
+				ok: false,
+				msg: 'No tienes permiso para realizar esta acción. Se requieren permisos de administrador.'
+			});
+		}
+
+		logger.info(`Eliminando usuario: ${userToDelete.email}`);
+		const deletedUser = await usersService.deleteUser(id);
+
+		if (!deletedUser) {
+			logger.error('Error al eliminar usuario: deleteUser devolvió null');
+			return res.status(500).json({
+				ok: false,
+				msg: 'Error al eliminar el usuario'
+			});
+		}
+
+		logger.info(`Usuario ${userToDelete.email} eliminado correctamente`);
 		return res.json({
 			ok: true,
-			msg: 'Usuario eliminado correctamente'
+			msg: 'Usuario eliminado correctamente',
+			deletedUserId: id
 		});
 	} catch (error) {
-		logger.error(`Error en deleteUser: ${error.message}`);
-		next(error);
+		logger.error('Error en deleteUser:', {
+			error: error.message,
+			stack: error.stack,
+			userId: req.user?._id,
+			targetUserId: req.params?.id
+		});
+		return res.status(500).json({
+			ok: false,
+			msg: 'Error interno del servidor al eliminar el usuario',
+			error: process.env.NODE_ENV === 'development' ? error.message : undefined
+		});
 	}
 };
 

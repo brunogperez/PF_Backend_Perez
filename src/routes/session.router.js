@@ -3,6 +3,7 @@ import { check } from 'express-validator';
 import {
   changePassword,
   deleteUser,
+  deleteInactiveUsers,
   getUserById,
   switchUserRole,
   getUsers,
@@ -67,7 +68,7 @@ router.delete('/user/:id', [
 router.delete('/inactive-users', [
   validarJWT,
   isAdmin
-], deleteUser);
+], deleteInactiveUsers);
 
 // Obtener un usuario por ID
 router.get('/user/:id', [
