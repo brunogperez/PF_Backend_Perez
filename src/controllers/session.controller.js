@@ -253,11 +253,7 @@ export const sessionRegister = async (req, res, next) => {
 	}
 };
 
-/**
- * @desc    Renovar token de autenticación
- * @route   GET /api/session/renew
- * @access  Privado
- */
+
 export const revalidateToken = async (req, res, next) => {
 	try {
 		const { _id, first_name, last_name, email, role } = req.user;
@@ -289,11 +285,7 @@ export const revalidateToken = async (req, res, next) => {
 	}
 };
 
-/**
- * @desc    Solicitar restablecimiento de contraseña
- * @route   POST /api/session/forgot-password
- * @access  Público
- */
+
 export const changePassword = async (req, res, next) => {
 	try {
 		const { email } = req.body;

@@ -6,13 +6,6 @@ import swaggerUiExpress from "swagger-ui-express";
 //BASE DE DATOS
 import { mongoDBConnection } from "./database/mongoConfig.js";
 
-//ROUTERS
-import productsRouter from "./routes/products.router.js";
-import cartsRouter from "./routes/carts.router.js";
-import sessionRouter from "./routes/session.router.js";
-import ticketsRouter from "./routes/tickets.router.js";
-import chatRouter from "./routes/chat.router.js";
-
 //UTLIDADES
 import __dirname from "./utils.js";
 import { logger } from "./utils/logger.js";
@@ -21,6 +14,13 @@ import { requestUrl } from "./middlewares/logger.middlewares.js";
 import { Server } from "socket.io";
 import http from "http";
 import { messagesService } from "./services/index.js";
+
+//ROUTERS
+import productsRouter from "./routes/products.router.js";
+import cartsRouter from "./routes/carts.router.js";
+import sessionRouter from "./routes/session.router.js";
+import ticketsRouter from "./routes/tickets.router.js";
+import chatRouter from "./routes/chat.router.js";
 
 const app = express();
 

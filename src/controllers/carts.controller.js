@@ -13,11 +13,11 @@ export const createEmptyCart = async (req, res) => {
       cart: newCart
     });
   } catch (error) {
-    req.logger.error('Error creating cart: ' + error);
+    logger.error('Error creating cart: ' + error.message);
     res.status(500).json({
       status: 'error',
       message: 'Error creating cart',
-      error: error.message
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 };
@@ -51,11 +51,11 @@ export const associateCartWithUser = async (req, res) => {
       }
     });
   } catch (error) {
-    req.logger.error('Error associating cart with user: ' + error);
+    logger.error('Error associating cart with user: ' + error.message);
     res.status(500).json({
       status: 'error',
       message: 'Error associating cart with user',
-      error: error.message
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 };
@@ -63,7 +63,7 @@ export const associateCartWithUser = async (req, res) => {
 export const getCartById = async (req, res) => {
   try {
     const { cid } = req.params;
-    const cart = await cartsService.getCartById(cid).populate('products.id');
+    const cart = await cartsService.getCartById(cid);
     
     if (!cart) {
       return res.status(404).json({
@@ -90,18 +90,30 @@ export const getCartById = async (req, res) => {
       });
     }
     
+    // Populate the products after getting the cart
+    const populatedCart = await cart.populate('products.id', ['title', 'price', 'stock', 'thumbnail']);
+    
     res.status(200).json({
       status: 'success',
       cart: {
-        ...cart.toObject(),
+        ...populatedCart.toObject(),
         user: user._id
       }
     });
   }
   catch (error) {
-    req.logger.error('Error: ' + error)
-    if (error.name == 'CastError') return res.status(404).send('Not found')
-    res.status(500).send('Server error')
+    logger.error('Error in getCartById: ' + error.message);
+    if (error.name === 'CastError') {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Cart not found'
+      });
+    }
+    res.status(500).json({
+      status: 'error',
+      message: 'Internal server error',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 }
 
@@ -203,15 +215,13 @@ export const deleteCartProducts = async (req, res) => {
   try {
 
     const { _id } = req
-    const { cid, pid } = req.params
+    const { cid } = req.params
 
     const user = await usersService.getUserById(_id)
     if (!user) return res.status(400).json('El user no existe')
 
     if (!(user.cart_id.toString() === cid)) return res.status(400).json('cart no valido')
 
-    const product = await productsService.getProductById(pid)
-    if (!product) return res.status(400).json('El producto no existe')
 
     const cart = await cartsService.deleteCartProducts(cid)
 
