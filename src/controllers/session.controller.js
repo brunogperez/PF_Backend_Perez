@@ -73,7 +73,7 @@ export const sessionLogin = async (req, res, next) => {
 		user.last_login = new Date();
 		await user.save();
 
-		const { _id, first_name, last_name, role } = user;
+		const { _id, first_name, last_name, role, cart_id } = user;
 
 		// Generar tokens
 		const token = generateToken({ _id, email, role });
@@ -100,7 +100,8 @@ export const sessionLogin = async (req, res, next) => {
 				first_name,
 				last_name,
 				email,
-				role
+				role,
+				cart_id
 			},
 			token
 		});
@@ -625,7 +626,7 @@ export const getUserById = async (req, res, next) => {
 				email,
 				role,
 				last_connection,
-				cart_id: cart_id ? cart_id.toString() : null
+				cart_id
 			}
 		});
 
