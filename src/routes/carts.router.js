@@ -1,6 +1,8 @@
 import { Router } from 'express'
 import { check } from 'express-validator'
 import {
+  createEmptyCart,
+  associateCartWithUser,
   getCartById,
   addProductsInCart,
   updateProductsInCart,
@@ -9,11 +11,24 @@ import {
   deleteProductsInCart,
   createIdPreference
 } from '../controllers/carts.controller.js'
-import { validarJWT, validateFields } from '../middlewares/auth.middlewares.js'
+import { validarJWT, validateFields, isAdmin } from '../middlewares/auth.middlewares.js'
 import { existCart } from '../utils/dbValidator.js'
 
 
 const router = Router()
+
+// Create empty cart
+router.post('/', [
+  validarJWT
+], createEmptyCart)
+
+// Associate cart with user
+router.put('/user/:userId/cart', [
+  validarJWT,
+  check('userId', 'Invalid user ID').isMongoId(),
+  check('cartId', 'Cart ID is required').notEmpty(),
+  validateFields
+], associateCartWithUser)
 
 router.get('/:cid', [
   validarJWT,

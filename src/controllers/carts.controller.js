@@ -5,18 +5,98 @@ import { sendEmailTicket } from '../utils/sendEmail.js'
 import { ACCESS_TOKEN_MP, URL_HOME_FRONT } from '../config/config.js'
 import { MercadoPagoConfig, Preference } from 'mercadopago'
 
+export const createEmptyCart = async (req, res) => {
+  try {
+    const newCart = await cartsService.createEmptyCart();
+    res.status(201).json({
+      status: 'success',
+      cart: newCart
+    });
+  } catch (error) {
+    req.logger.error('Error creating cart: ' + error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Error creating cart',
+      error: error.message
+    });
+  }
+};
+
+export const associateCartWithUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { cartId } = req.body;
+
+    const user = await usersService.getUserById(userId);
+    if (!user) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'User not found'
+      });
+    }
+
+    // Update user's cart reference
+    user.cart_id = cartId;
+    await user.save();
+
+    // Remove password from response
+    const { password, ...userWithoutPassword } = user.toObject();
+    
+    res.status(200).json({
+      status: 'success',
+      message: 'Carrito asociado al usuario correctamente',
+      user: {
+        ...userWithoutPassword,
+        cart_id: cartId
+      }
+    });
+  } catch (error) {
+    req.logger.error('Error associating cart with user: ' + error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Error associating cart with user',
+      error: error.message
+    });
+  }
+};
+
 export const getCartById = async (req, res) => {
   try {
-    const { _id } = req
-    const { cid } = req.params
-
-    const cart = await cartsService.getCartById(cid)
-    const user = await usersService.getUserById(_id)
-
-    if (!user) return res.status(400).json('El user no existe')
-    if (!(user.cart_id.toString() === cid)) return res.status(400).json('cart no valido')
-
-    res.json({ cart })
+    const { cid } = req.params;
+    const cart = await cartsService.getCartById(cid).populate('products.id');
+    
+    if (!cart) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Cart not found'
+      });
+    }
+    
+    // Verify the requesting user owns this cart
+    const { _id } = req;
+    const user = await usersService.getUserById(_id);
+    
+    if (!user) {
+      return res.status(401).json({
+        status: 'error',
+        message: 'Authentication required'
+      });
+    }
+    
+    if (user.cart_id.toString() !== cid && user.role !== 'admin') {
+      return res.status(403).json({
+        status: 'error',
+        message: 'Not authorized to access this cart'
+      });
+    }
+    
+    res.status(200).json({
+      status: 'success',
+      cart: {
+        ...cart.toObject(),
+        user: user._id
+      }
+    });
   }
   catch (error) {
     req.logger.error('Error: ' + error)

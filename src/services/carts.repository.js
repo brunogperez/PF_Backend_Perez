@@ -5,6 +5,15 @@ export default class CartsRepository {
 
   getCartById = async (cid) => await this.dao.getCartById(cid)
 
+  createEmptyCart = async () => {
+    try {
+      const newCart = await this.dao.addCart();
+      return newCart;
+    } catch (error) {
+      throw new Error(`Error creating empty cart: ${error.message}`);
+    }
+  }
+
   addCart = async () => await this.dao.addCart()
 
   addProductsInCart = async (cid, pid) => await this.dao.addProductsInCart(cid, pid)
