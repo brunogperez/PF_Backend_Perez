@@ -614,7 +614,7 @@ export const getUserById = async (req, res, next) => {
 		}
 
 		// Devolver los datos del usuario (sin información sensible)
-		const { _id, first_name, last_name, email, role, last_connection } = user;
+		const { _id, first_name, last_name, email, role, last_connection, cart_id } = user;
 		
 		return res.json({
 			ok: true,
@@ -624,7 +624,8 @@ export const getUserById = async (req, res, next) => {
 				last_name,
 				email,
 				role,
-				last_connection
+				last_connection,
+				cart_id: cart_id ? cart_id.toString() : null
 			}
 		});
 
